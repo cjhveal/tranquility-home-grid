@@ -116,7 +116,7 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
     }
   }
 
-  return <div className="grid grid-cols-4 gap-4 max-w-2xl">
+  return <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
     <div />
     <BuilderGridHeader cellId="A" selectedId={selectedId} onClick={() => onSelectId("A")} constraint={constraintMap["A"]} />
     <BuilderGridHeader cellId="B" selectedId={selectedId} onClick={() => onSelectId("B")} constraint={constraintMap["B"]} />

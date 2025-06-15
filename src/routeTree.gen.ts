@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameIndexRouteImport } from './routes/game/index'
+import { Route as SysopSearchRouteImport } from './routes/sysop/search'
 import { Route as SysopBuilderRouteImport } from './routes/sysop/builder'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const GameIndexRoute = GameIndexRouteImport.update({
   path: '/game/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SysopSearchRoute = SysopSearchRouteImport.update({
+  id: '/sysop/search',
+  path: '/sysop/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SysopBuilderRoute = SysopBuilderRouteImport.update({
   id: '/sysop/builder',
   path: '/sysop/builder',
@@ -32,30 +38,34 @@ const SysopBuilderRoute = SysopBuilderRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sysop/builder': typeof SysopBuilderRoute
+  '/sysop/search': typeof SysopSearchRoute
   '/game': typeof GameIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sysop/builder': typeof SysopBuilderRoute
+  '/sysop/search': typeof SysopSearchRoute
   '/game': typeof GameIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sysop/builder': typeof SysopBuilderRoute
+  '/sysop/search': typeof SysopSearchRoute
   '/game/': typeof GameIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sysop/builder' | '/game'
+  fullPaths: '/' | '/sysop/builder' | '/sysop/search' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sysop/builder' | '/game'
-  id: '__root__' | '/' | '/sysop/builder' | '/game/'
+  to: '/' | '/sysop/builder' | '/sysop/search' | '/game'
+  id: '__root__' | '/' | '/sysop/builder' | '/sysop/search' | '/game/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SysopBuilderRoute: typeof SysopBuilderRoute
+  SysopSearchRoute: typeof SysopSearchRoute
   GameIndexRoute: typeof GameIndexRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sysop/search': {
+      id: '/sysop/search'
+      path: '/sysop/search'
+      fullPath: '/sysop/search'
+      preLoaderRoute: typeof SysopSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sysop/builder': {
       id: '/sysop/builder'
       path: '/sysop/builder'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SysopBuilderRoute: SysopBuilderRoute,
+  SysopSearchRoute: SysopSearchRoute,
   GameIndexRoute: GameIndexRoute,
 }
 export const routeTree = rootRouteImport

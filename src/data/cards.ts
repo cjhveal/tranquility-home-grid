@@ -8,6 +8,9 @@ import {packsByFormat} from './packs'
 
 import rawCardData from './json/cards.json';
 
+export const IMAGE_URL_TEMPLATE = rawCardData.imageUrlTemplate;
+export const getImageUrlForCard = (card: NrdbCardT) => IMAGE_URL_TEMPLATE.replace('{code}', card.code);
+
 export const allCards: NrdbCardT[] = [];
 export const cardsByFormat: {[FormatCode in keyof typeof packsByFormat]: NrdbCardT[]} = {
   'standard': [],

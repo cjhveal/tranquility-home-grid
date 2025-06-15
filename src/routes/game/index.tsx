@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { allCards, cardsByCost, cardsBySubtype, titleWordCount, cardsByTitleStartLetter } from '@/data/cards.ts';
 
+import { CardSearch } from '@/components/card-search';
+
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
 })
@@ -88,6 +90,8 @@ function RouteComponent() {
             <GameCell />
           </div>
         </div>
+
+        <CardSearch />
 
         <div>Share, etc.</div>
         <div style={{display:"none"}}>
