@@ -4,23 +4,35 @@ import {NrdbCardType, type NrdbCardT} from '@/types.ts';
 
 import {groupBy} from './utils';
 
+import {packsByFormat} from './packs'
+
 import rawCardData from './json/cards.json';
 
-
-
 export const allCards: NrdbCardT[] = [];
+export const cardsByFormat: {[FormatCode in keyof typeof packsByFormat]: NrdbCardT[]} = {
+  'standard': [],
+  'startup': [],
+}
 
 for (const rawCard of rawCardData.data) {
   try {
     const parsedCard = Value.Parse(NrdbCardType, rawCard);
     if (parsedCard) {
       allCards.push(parsedCard);
+
+      if (packsByFormat.standard.includes(parsedCard.pack_code)) {
+        cardsByFormat.standard.push(parsedCard);
+      }
+      if (packsByFormat.startup.includes(parsedCard.pack_code)) {
+        cardsByFormat.startup.push(parsedCard);
+      }
     }
   } catch (e) {
     console.error(e, rawCard);
   }
 }
 
+export const allSubtypes = new Set<string>();
 export const cardsBySubtype: {[subtype: string]: Set<NrdbCardT>} = {};
 for (const card of allCards) {
   if (!card) continue;
@@ -31,6 +43,8 @@ for (const card of allCards) {
       const set = cardsBySubtype[subtype] || new Set();
       set.add(card);
       cardsBySubtype[subtype] = set;
+
+      allSubtypes.add(subtype);
     }
   }
 }
@@ -41,7 +55,6 @@ export const cardsByIllustrator = groupBy(allCards, (item) => item.illustrator);
 
 
 
-export const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test"]
 
 // get word histogram
 export const titleWordCount: Record<string, number> = {};

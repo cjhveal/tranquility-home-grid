@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameIndexRouteImport } from './routes/game/index'
+import { Route as SysopBuilderRouteImport } from './routes/sysop/builder'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const GameIndexRoute = GameIndexRouteImport.update({
   path: '/game/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SysopBuilderRoute = SysopBuilderRouteImport.update({
+  id: '/sysop/builder',
+  path: '/sysop/builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sysop/builder': typeof SysopBuilderRoute
   '/game': typeof GameIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sysop/builder': typeof SysopBuilderRoute
   '/game': typeof GameIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sysop/builder': typeof SysopBuilderRoute
   '/game/': typeof GameIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/game'
+  fullPaths: '/' | '/sysop/builder' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game'
-  id: '__root__' | '/' | '/game/'
+  to: '/' | '/sysop/builder' | '/game'
+  id: '__root__' | '/' | '/sysop/builder' | '/game/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SysopBuilderRoute: typeof SysopBuilderRoute
   GameIndexRoute: typeof GameIndexRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sysop/builder': {
+      id: '/sysop/builder'
+      path: '/sysop/builder'
+      fullPath: '/sysop/builder'
+      preLoaderRoute: typeof SysopBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SysopBuilderRoute: SysopBuilderRoute,
   GameIndexRoute: GameIndexRoute,
 }
 export const routeTree = rootRouteImport

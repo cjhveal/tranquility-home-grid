@@ -120,7 +120,10 @@ export const NrdbPackType = Type.Object({
   name: Type.String(),
   position: Type.Number(),
   size: Type.Number(),
-  ffg_id: Type.Number(),
+  ffg_id: Type.Union([
+    Type.Number(),
+    Type.Null(),
+  ]),
 });
 
 export type NrdbPackT = Static<typeof NrdbPackType>;

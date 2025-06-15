@@ -17,7 +17,7 @@ for (const rawCycle of rawCycleData.data) {
   }
 }
 
-const ALL_FORMATS = ['standard', 'startup', 'eternal']
+export const ALL_FORMATS = ['standard', 'startup', 'eternal']
 
 export const cycleCodesByFormat: Record<string,string[]> = {
   'standard': [

@@ -89,13 +89,13 @@ function RouteComponent() {
           </div>
         </div>
 
-        <div>Share, lol.</div>
+        <div>Share, etc.</div>
         <div style={{display:"none"}}>
           {allWordCounts.map(([word, count]) => (<div>
             {count} {word}
           </div>))}
         </div>
-        <div>
+        <div style={{display:"none"}}>
           {allWordStarts.map(([word, list]) => (<div>
             {list.length} {word}
           </div>))}

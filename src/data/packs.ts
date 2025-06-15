@@ -5,7 +5,7 @@ import {NrdbPackType, type NrdbPackT} from '@/types.ts';
 import {groupBy} from './utils';
 import {cycleCodesByFormat} from './cycles';
 
-import rawPackData from './json/cycles.json';
+import rawPackData from './json/packs.json';
 
 export const allPacks: NrdbPackT[] = [];
 
@@ -22,13 +22,14 @@ for (const rawPack of rawPackData.data) {
 
 export const packsByCycle = groupBy(allPacks, pack => pack.cycle_code);
 
-function getPacksByFormat(format: string): NrdbPackT[] {
+function getPacksByFormat(format: string): string[] {
   const validCycles = cycleCodesByFormat[format];
 
-  return allPacks.filter(pack => validCycles.includes(pack.cycle_code))
+  return allPacks
+    .filter(pack => validCycles.includes(pack.cycle_code))
+    .map(pack => pack.code);
 }
 export const packsByFormat = {
-  'standard': getPacksByFormat,
-  'startup': [],
-  'eternal': [...allPacks],
+  'standard': getPacksByFormat('standard'),
+  'startup': getPacksByFormat('startup'),
 };
