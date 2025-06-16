@@ -17,11 +17,12 @@ function RouteComponent() {
     setSelectedCard(card)
   }, []);
     
-  return <div>
+  return <div className="h-screen max-w-2xl w-full">
     <h1> search test</h1>
 
-    <div>
+    <div className="flex gap-2 w-full">
       <CardSearch onSelect={handleSelectCard}/>
+      <div className="size-8 bg-amber-600"></div>
     </div>
 
     <div>

@@ -1,27 +1,27 @@
+import * as React from 'react';
+
 import { createFileRoute } from '@tanstack/react-router'
 
 import { allCards, cardsByCost, cardsBySubtype, titleWordCount, cardsByTitleStartLetter } from '@/data/cards.ts';
 
+import { Page } from '@/components/page';
 import { CardSearch } from '@/components/card-search';
+import { CardSelectDialog } from '@/components/card-select-dialog';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
 })
 
 
-interface PageProps extends React.PropsWithChildren {}
-function Page({children}: PageProps) {
-  return (<div className="min-h-screen w-full dark:bg-slate-950 dark:text-violet-100">
-    {children}
-  </div>);
-}
 
 interface GameCellProps extends React.PropsWithChildren {
-
+  onClick?: () => void;
 }
-function GameCell({children}: GameCellProps) {
-  return <div role="button" 
-    className="flex aspect-square rounded-lg ring-2 ring-black dark:ring-violet-400 bg-white dark:bg-slate-950 cursor-pointer"
+function GameCell({children, onClick}: GameCellProps) {
+  return <div 
+    role="button" 
+    className="flex aspect-square rounded-lg transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 dark:inset-shadow-sm hover:dark:inset-shadow-violet-700 cursor-pointer"
+    onClick={onClick}
   >
     {children}
   </div>
@@ -35,28 +35,19 @@ function HeaderCell({children}: HeaderCellProps) {
   </div>
 }
 
+
 function RouteComponent() {
-  const costTwo = cardsByCost["2"].length
-  //const barrierCount = cardsBySubtype["Barrier"]?.size;
-
-  const nameIncludes = allCards.filter(card => {
-    return card.stripped_title.toLowerCase().includes("data")
-  }).length;
-
-  const allWordCounts = [...Object.entries(titleWordCount)].sort((entryA, entryB) => {
-    return entryB[1] - entryA[1];
-  })
-
-  const allWordStarts = [...Object.entries(cardsByTitleStartLetter)]
-    .sort((entryA, entryB) => entryB[1].length - entryA[1].length)
+  const [isCardDialogOpen, setIsCardDialogOpen] = React.useState(false);
+  const handleCloseCardDialog = () => setIsCardDialogOpen(false);
 
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">
+      <CardSelectDialog isOpen={isCardDialogOpen} onClose={handleCloseCardDialog} />
 
       <div className="max-w-2xl w-full">
         <header className="w-full flex items-center p-1 md:mt-4 mb-4 md:mb-12 gap-4 text-xl md:text-3xl font-medium">
           <img className="size-[48px] md:size-auto" src="icon@2x.png" />
-          <div className="">Tranquility Home Grid</div>
+          <div className="text-violet-200">Tranquility Home Grid</div>
         </header>
 
         <div className="px-2">
@@ -72,8 +63,8 @@ function RouteComponent() {
           <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
             <HeaderCell>Barrier</HeaderCell>
 
-            <GameCell>{nameIncludes} </GameCell>
-            <GameCell> {costTwo}</GameCell>
+            <GameCell onClick={() => setIsCardDialogOpen(true)}> </GameCell>
+            <GameCell> </GameCell>
             <GameCell />
 
             <HeaderCell>Region</HeaderCell>
@@ -91,19 +82,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <CardSearch />
 
-        <div>Share, etc.</div>
-        <div style={{display:"none"}}>
-          {allWordCounts.map(([word, count]) => (<div>
-            {count} {word}
-          </div>))}
-        </div>
-        <div style={{display:"none"}}>
-          {allWordStarts.map(([word, list]) => (<div>
-            {list.length} {word}
-          </div>))}
-        </div>
         <footer></footer>
       </div>
     </div>
