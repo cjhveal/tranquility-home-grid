@@ -212,5 +212,8 @@ export const PuzzleSpecType = Type.Object({
   }),
 });
 
+
 export type TPuzzleSpec = Static<typeof PuzzleSpecType>
+
+export type TConstraintKey = keyof TPuzzleSpec['constraints']
 

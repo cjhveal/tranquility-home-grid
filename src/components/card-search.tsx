@@ -3,20 +3,15 @@ import * as React from 'react';
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 
 import {type NrdbCardT} from '@/types';
-import {cardsByFormat} from '@/data/cards';
 
-function getCurrentFormatCards() {
-  return cardsByFormat['standard'];
-}
 
 
 export interface CardSearchProps {
   autoFocus?: boolean,
   onSelect?: (card: NrdbCardT) => void,
+  cardsInFormat: NrdbCardT[],
 };
-export function CardSearch({onSelect, autoFocus}: CardSearchProps) {
-  const cardsInFormat = React.useMemo(() => getCurrentFormatCards(), []);
-
+export function CardSearch({onSelect, autoFocus, cardsInFormat}: CardSearchProps) {
   const [selectedCard, setSelectedCard] = React.useState<NrdbCardT | null>(null);
   const [query, setQuery] = React.useState('');
 

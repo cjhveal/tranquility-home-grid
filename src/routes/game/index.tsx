@@ -2,13 +2,18 @@ import * as React from 'react';
 
 import { createFileRoute } from '@tanstack/react-router'
 
-import { allCards, cardsByCost, cardsBySubtype, titleWordCount, cardsByTitleStartLetter } from '@/data/cards.ts';
+import type {TConstraintKey} from '@/types';
+import { CardConstraint } from '@/constraints';
+import {parsePuzzleSpec, EXAMPLE_PUZZLE_1} from '@/puzzle';
 
 import { Page } from '@/components/page';
-import { CardSearch } from '@/components/card-search';
 import { CardSelectDialog } from '@/components/card-select-dialog';
+import {cardsByFormat} from '@/data/cards';
 
-import {parsePuzzleSpec, EXAMPLE_PUZZLE_1} from '@/puzzle';
+// @TODO: Base this on format state
+function getCurrentFormatCards() {
+  return cardsByFormat['standard'];
+}
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
@@ -42,18 +47,51 @@ function HeaderCell({children}: HeaderCellProps) {
   </div>
 }
 
+interface CardDialogState {
+  isOpen: boolean,
+  firstConstraint: CardConstraint,
+  secondConstraint: CardConstraint,
+}
 
 function RouteComponent() {
-  const [isCardDialogOpen, setIsCardDialogOpen] = React.useState(false);
-  const handleCloseCardDialog = () => setIsCardDialogOpen(false);
-
   const {puzzle} = Route.useLoaderData();
+  const cardsInFormat = React.useMemo(() => getCurrentFormatCards(), []);
+
+  const [cardDialogState, setCardDialogState] = React.useState({
+    isOpen: false,
+    firstConstraint: puzzle.constraints["A"],
+    secondConstraint: puzzle.constraints["1"],
+  });
+  const handleCloseCardDialog = () => {
+    setCardDialogState((state) => ({...state, isOpen: false}))
+  };
+
+  const handleOpenCardDialog = React.useCallback((firstKey: TConstraintKey, secondKey: TConstraintKey) => {
+    const firstConstraint = puzzle.constraints[firstKey];
+    const secondConstraint = puzzle.constraints[secondKey];
+
+    setCardDialogState((state) => {
+      return {
+        ...state,
+        firstConstraint,
+        secondConstraint,
+        isOpen: true,
+      }
+    });
+  }, [puzzle, setCardDialogState]);
+
 
   const {constraints} = puzzle;
 
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">
-      <CardSelectDialog isOpen={isCardDialogOpen} onClose={handleCloseCardDialog} />
+      <CardSelectDialog 
+        isOpen={cardDialogState.isOpen} 
+        onClose={handleCloseCardDialog} 
+        firstConstraint={cardDialogState.firstConstraint}
+        secondConstraint={cardDialogState.secondConstraint}
+        cardsInFormat={cardsInFormat}
+      />
 
       <div className="max-w-2xl w-full">
         <header className="w-full flex items-center p-1 md:mt-4 mb-4 md:mb-12 gap-4 text-xl md:text-3xl font-medium">
@@ -71,22 +109,22 @@ function RouteComponent() {
 
             <HeaderCell>{constraints["1"].getName()}</HeaderCell>
 
-            <GameCell onClick={() => setIsCardDialogOpen(true)}> </GameCell>
-            <GameCell> </GameCell>
-            <GameCell />
+            <GameCell onClick={() => handleOpenCardDialog("A", "1")}> </GameCell>
+            <GameCell onClick={() => handleOpenCardDialog("B", "1")}> </GameCell>
+            <GameCell onClick={() => handleOpenCardDialog("C", "1")} />
 
             <HeaderCell>{constraints["2"].getName()}</HeaderCell>
 
-            <GameCell />
-            <GameCell />
-            <GameCell />
+            <GameCell onClick={() => handleOpenCardDialog("A", "2")}/>
+            <GameCell onClick={() => handleOpenCardDialog("B", "2")}/>
+            <GameCell onClick={() => handleOpenCardDialog("C", "2")}/>
 
 
             <HeaderCell>{constraints["3"].getName()}</HeaderCell>
 
-            <GameCell />
-            <GameCell />
-            <GameCell />
+            <GameCell onClick={() => handleOpenCardDialog("A", "3")}/>
+            <GameCell onClick={() => handleOpenCardDialog("B", "3")}/>
+            <GameCell onClick={() => handleOpenCardDialog("C", "3")}/>
           </div>
         </div>
 
