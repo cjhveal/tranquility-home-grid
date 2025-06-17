@@ -127,3 +127,90 @@ export const NrdbPackType = Type.Object({
 });
 
 export type NrdbPackT = Static<typeof NrdbPackType>;
+
+
+export const ConstraintSpecType = Type.Union([
+  Type.Object({
+    kind: Type.Literal('titleStart'),
+    payload: Type.Object({
+      chars: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('titleIncludes'),
+    payload: Type.Object({
+      parts: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('cost'),
+    payload: Type.Object({
+      costs: Type.Array(Type.Number()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('faction'),
+    payload: Type.Object({
+      factions: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('illustrator'),
+    payload: Type.Object({
+      illustrators: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('uniqueness'),
+    payload: Type.Object({
+      unique: Type.Boolean(),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('type'),
+    payload: Type.Object({
+      types: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('subtype'),
+    payload: Type.Object({
+      subtypes: Type.Array(Type.String()),
+    })
+  }),
+  Type.Object({
+    kind: Type.Literal('influence'),
+    payload: Type.Object({
+      costs: Type.Array(Type.Number()),
+    })
+  }),
+]);
+
+
+export type TConstraintSpec = Static<typeof ConstraintSpecType>;
+
+export type TConstraintKind = TConstraintSpec['kind'];
+
+export type PayloadOf<K extends TConstraintKind> = Extract<
+  TConstraintSpec,
+  { kind: K }
+>['payload'];
+
+export type TConstraintSpecByKind = {
+  [K in TConstraintKind]: { kind: K, payload: PayloadOf<K>};
+}
+
+export const PuzzleSpecType = Type.Object({
+  id: Type.String(),
+  constraints: Type.Object({
+    "A": ConstraintSpecType,
+    "B": ConstraintSpecType,
+    "C": ConstraintSpecType,
+    "1": ConstraintSpecType,
+    "2": ConstraintSpecType,
+    "3": ConstraintSpecType,
+  }),
+});
+
+export type TPuzzleSpec = Static<typeof PuzzleSpecType>
+

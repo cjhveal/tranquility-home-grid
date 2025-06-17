@@ -12,9 +12,14 @@ import {
   UniqueConstraint,
   SubtypeConstraint,
   InfluenceConstraint,
-  } from '@/constraints';
+} from '@/constraints';
+
+import { type IncompletePuzzleConstraints } from '@/puzzle';
 
 import {allCards, cardsByFormat, allSubtypes} from '@/data/cards';
+import type { NrdbCardT } from '@/types';
+
+import {Button} from '@/components/button';
 
 export const Route = createFileRoute('/sysop/builder')({
   component: RouteComponent,
@@ -40,11 +45,11 @@ function BuilderGridBaseCell(props: BuilderGridBaseCellProps) {
 }
 
 const allConstraints = [
-  ...COSTS.map(cost => new CostConstraint(cost)),
-  ...ALPHABET.map(char => new TitleStartConstraint(char)),
-  ...[...allSubtypes.values()].map(subtype => new SubtypeConstraint(subtype)),
-  ...TITLE_WORDS.map(word => new TitleIncludesConstraint(word)),
-  ...INFLUENCE_COUNTS.map(inf => new InfluenceConstraint(inf)),
+  ...COSTS.map(cost => new CostConstraint({costs : [cost]})),
+  ...ALPHABET.map(char => new TitleStartConstraint({chars: [char]})),
+  ...[...allSubtypes.values()].map(subtype => new SubtypeConstraint({subtypes: [subtype]})),
+  ...TITLE_WORDS.map(word => new TitleIncludesConstraint({parts: [word]})),
+  ...INFLUENCE_COUNTS.map(inf => new InfluenceConstraint({costs: [inf]})),
 ];
 
 interface BuilderGridHeaderProps extends React.PropsWithChildren {
@@ -58,7 +63,7 @@ function BuilderGridHeader({selectedId, cellId, onClick, constraint}: BuilderGri
   const isSelected = cellId && (cellId === selectedId);
   const ringColor = (!isSelectable && 'ring-black') || (isSelected ? 'ring-red-700' : 'ring-blue-700')
 
-  const name = constraint && (constraint.infoText.name);
+  const name = constraint && (constraint.getName());
   return <BuilderGridBaseCell
     ringColor={ringColor}
     isSelectable={isSelectable}
@@ -95,22 +100,24 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
     const secondConstraint = secondId && constraintMap[secondId];
 
     if (firstConstraint && secondConstraint) {
-      return CardConstraint.and({name: `${firstId}+${secondId}`}, firstConstraint, secondConstraint)
+      return (cards: NrdbCardT[]) => {
+        return secondConstraint.filter(firstConstraint.filter(cards));
+      }
     } else if (firstConstraint) {
-      return firstConstraint;
+      return (cards: NrdbCardT[]) => firstConstraint.filter(cards);
     } else if (secondConstraint) {
-      return secondConstraint;
+      return (cards: NrdbCardT[]) => secondConstraint.filter(cards);
     }
   }
 
   const computeIntersectionCounts = (firstId: string | null, secondId: string | null) => {
-    const constraint = intersectConstraints(firstId, secondId);
+    const filterCards = intersectConstraints(firstId, secondId);
 
-    if (constraint) {
+    if (filterCards) {
       return {
-        eternal: constraint.filter(allCards).length,
-        standard: constraint.filter(cardsByFormat.standard).length,
-        startup: constraint.filter(cardsByFormat.startup).length,
+        eternal: filterCards(allCards).length,
+        standard: filterCards(cardsByFormat.standard).length,
+        startup: filterCards(cardsByFormat.startup).length,
       }
       
     }
@@ -141,7 +148,7 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
 
 function RouteComponent() {
   const [selectedId, setSelectedId] = React.useState("1");
-  const [constraintMap, setConstraintMap] = React.useState({
+  const [constraintMap, setConstraintMap] = React.useState<IncompletePuzzleConstraints>({
     "1": null,
     "2": null,
     "3": null,
@@ -154,6 +161,31 @@ function RouteComponent() {
     const nextMap = {...constraintMap, [selectedId]: constraint}
     setConstraintMap(nextMap)
   }
+
+  const getPuzzleSpec = () => {
+    if (constraintMap["1"] && constraintMap["2"] && constraintMap["3"] && constraintMap["A"] && constraintMap["B"] && constraintMap["C"]) {
+      return {
+        id: 1,
+        constraints: {
+          "1": constraintMap["1"].toSpec(),
+          "2": constraintMap["2"].toSpec(),
+          "3": constraintMap["3"].toSpec(),
+          "A": constraintMap["A"].toSpec(),
+          "B": constraintMap["B"].toSpec(),
+          "C": constraintMap["C"].toSpec(),
+        }
+      }
+    }
+  }
+
+  const handleCopyPuzzleSpec = () => {
+    const spec = getPuzzleSpec();
+
+    
+    if (spec) {
+      window.navigator.clipboard.writeText(JSON.stringify(spec));
+    }
+  }
   
 
   return <div>
@@ -165,6 +197,10 @@ function RouteComponent() {
       onSelectId={setSelectedId}
       constraintMap={constraintMap}
     />
+
+    <Button onClick={handleCopyPuzzleSpec}>
+      Copy Puzzle Spec
+    </Button>
 
     <table className="mx-auto max-w-2xl">
       <thead>
@@ -179,7 +215,7 @@ function RouteComponent() {
       <tbody>
       {allConstraints.map(constraint => (
         <tr onClick={() => selectConstraint(constraint)}>
-          <td>{constraint.infoText.name}</td>
+          <td>{constraint.getName()}</td>
           <td>{constraint.filter(allCards).length}</td>
           <td>{constraint.filter(cardsByFormat.standard).length}</td>
           <td>{constraint.filter(cardsByFormat.startup).length}</td>

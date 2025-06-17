@@ -35,6 +35,14 @@ for (const rawCard of rawCardData.data) {
   }
 }
 
+export function getSubtypesForCard(card: NrdbCardT): string[] {
+  if (!card.keywords) {
+    return [];
+  }
+
+  return card.keywords.split(' - ');
+}
+
 export const allSubtypes = new Set<string>();
 export const cardsBySubtype: {[subtype: string]: Set<NrdbCardT>} = {};
 for (const card of allCards) {

@@ -8,8 +8,15 @@ import { Page } from '@/components/page';
 import { CardSearch } from '@/components/card-search';
 import { CardSelectDialog } from '@/components/card-select-dialog';
 
+import {parsePuzzleSpec, EXAMPLE_PUZZLE_1} from '@/puzzle';
+
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
+  loader: () => {
+    const puzzle =  parsePuzzleSpec(EXAMPLE_PUZZLE_1);
+
+    return {puzzle};
+  }
 })
 
 
@@ -40,6 +47,10 @@ function RouteComponent() {
   const [isCardDialogOpen, setIsCardDialogOpen] = React.useState(false);
   const handleCloseCardDialog = () => setIsCardDialogOpen(false);
 
+  const {puzzle} = Route.useLoaderData();
+
+  const {constraints} = puzzle;
+
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">
       <CardSelectDialog isOpen={isCardDialogOpen} onClose={handleCloseCardDialog} />
@@ -53,28 +64,25 @@ function RouteComponent() {
         <div className="px-2">
           <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
             {/*TODO: Add a reasonable min height here rather than margin from header to limit chance of content shifting*/}
-            <HeaderCell>Rarity: 0</HeaderCell>
-            <HeaderCell>Name includes "data"</HeaderCell>
-            <HeaderCell>Cost 2</HeaderCell>
-            <HeaderCell>Faction: NBN, Shaper</HeaderCell>
-          </div>
+            <HeaderCell></HeaderCell>
+            <HeaderCell>{constraints["A"].getName()}</HeaderCell>
+            <HeaderCell>{constraints["B"].getName()}</HeaderCell>
+            <HeaderCell>{constraints["C"].getName()}</HeaderCell>
 
-
-          <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-4">
-            <HeaderCell>Barrier</HeaderCell>
+            <HeaderCell>{constraints["1"].getName()}</HeaderCell>
 
             <GameCell onClick={() => setIsCardDialogOpen(true)}> </GameCell>
             <GameCell> </GameCell>
             <GameCell />
 
-            <HeaderCell>Region</HeaderCell>
+            <HeaderCell>{constraints["2"].getName()}</HeaderCell>
 
             <GameCell />
             <GameCell />
             <GameCell />
 
 
-            <HeaderCell>Unique</HeaderCell>
+            <HeaderCell>{constraints["3"].getName()}</HeaderCell>
 
             <GameCell />
             <GameCell />
