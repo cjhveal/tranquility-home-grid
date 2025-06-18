@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import {matchSorter} from 'match-sorter';
+
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 
 import {type NrdbCardT} from '@/types';
@@ -23,15 +25,15 @@ export function CardSearch({onSelect, autoFocus, cardsInFormat}: CardSearchProps
     }
   }, [onSelect, setSelectedCard]);
   
-/*
- * @TODO: Use uFuzzy to do fuzzy searching for the card input
- */
   const filteredCards = React.useMemo(() => {
-    return query === ''
-      ? cardsInFormat
-      : cardsInFormat.filter((card) => {
-          return card.stripped_title.toLowerCase().includes(query.toLowerCase())
-        });
+    if (query === '') {
+      return cardsInFormat;
+    }
+
+    return matchSorter(cardsInFormat, query, {
+      keys: ['stripped_title'],
+      threshold: matchSorter.rankings.ACRONYM,
+    });
   }, [query, cardsInFormat])
 
   return (
