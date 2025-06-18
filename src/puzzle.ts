@@ -1,5 +1,10 @@
 import { Value } from '@sinclair/typebox/value';
-import { PuzzleSpecType } from "./types";
+import { 
+  PuzzleSpecType,
+  type TColKey,
+  type TRowKey,
+  type NrdbCardT,
+} from "@/types";
 
 
 import {CardConstraint} from '@/constraints';
@@ -42,5 +47,32 @@ export function parsePuzzleSpec(input: unknown): TPuzzle {
       "B": CardConstraint.fromSpec(constraintSpecs["B"]),
       "C": CardConstraint.fromSpec(constraintSpecs["C"]),
     }
+  }
+}
+
+
+export type TSolution = {
+  [C in TColKey]: {
+    [R in TRowKey]: null | NrdbCardT;
+  }
+}
+
+export function getBlankSolution(): TSolution {
+  return {
+    "A": {
+      "1": null,
+      "2": null,
+      "3": null,
+    },
+    "B": {
+      "1": null,
+      "2": null,
+      "3": null,
+    },
+    "C": {
+      "1": null,
+      "2": null,
+      "3": null,
+    },
   }
 }

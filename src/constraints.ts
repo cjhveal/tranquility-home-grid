@@ -240,7 +240,7 @@ export class InfluenceConstraint extends CardConstraint<'influence'> {
   predicate(card: NrdbCardT) {
     const {costs} = this.payload;
 
-    return costs.some(cost => cost === card.cost || cost === card.advancement_cost);
+    return costs.some(cost => cost === card.faction_cost);
   }
 
   getName() {

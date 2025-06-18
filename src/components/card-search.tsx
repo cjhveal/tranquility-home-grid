@@ -8,14 +8,14 @@ import {type NrdbCardT} from '@/types';
 
 export interface CardSearchProps {
   autoFocus?: boolean,
-  onSelect?: (card: NrdbCardT) => void,
+  onSelect?: (card: null | NrdbCardT) => void,
   cardsInFormat: NrdbCardT[],
 };
 export function CardSearch({onSelect, autoFocus, cardsInFormat}: CardSearchProps) {
   const [selectedCard, setSelectedCard] = React.useState<NrdbCardT | null>(null);
   const [query, setQuery] = React.useState('');
 
-  const handleSelectCard = React.useCallback((card: NrdbCardT) => {
+  const handleSelectCard = React.useCallback((card: null | NrdbCardT) => {
     setSelectedCard(card);
 
     if (onSelect) {
@@ -42,11 +42,15 @@ export function CardSearch({onSelect, autoFocus, cardsInFormat}: CardSearchProps
       onClose={() => setQuery('')}
     >
       <ComboboxInput
+        autoComplete="off"
         autoFocus={autoFocus}
         aria-label="Card"
         className="w-full py-1 px-2 border border-black dark:text-violet-50 dark:border-violet-300 bg-white dark:bg-gray-950 rounded-md text-md md:text-xl"
         displayValue={(card: NrdbCardT | null) => (card?.title || '')}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => {
+          handleSelectCard(null);
+          setQuery(event.target.value)
+        }}
       />
       <ComboboxOptions anchor="bottom" className="w-(--input-width) p-2 border dark:border-violet-300 bg-white dark:bg-gray-950 empty:invisible">
         {({option: card}) => (

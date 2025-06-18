@@ -217,3 +217,6 @@ export type TPuzzleSpec = Static<typeof PuzzleSpecType>
 
 export type TConstraintKey = keyof TPuzzleSpec['constraints']
 
+export type TRowKey = "1" | "2" | "3";
+export type TColKey = "A" | "B" | "C";
+
