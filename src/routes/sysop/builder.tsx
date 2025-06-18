@@ -10,13 +10,14 @@ import {
   FactionConstraint,
   IllustratorConstraint,
   UniqueConstraint,
+  TypeConstraint,
   SubtypeConstraint,
   InfluenceConstraint,
 } from '@/constraints';
 
 import { type IncompletePuzzleConstraints } from '@/puzzle';
 
-import {allCards, cardsByFormat, allSubtypes} from '@/data/cards';
+import {allCards, cardsByFormat, allCardTypes, allSubtypes} from '@/data/cards';
 import type { NrdbCardT } from '@/types';
 
 import {Button} from '@/components/button';
@@ -47,6 +48,7 @@ function BuilderGridBaseCell(props: BuilderGridBaseCellProps) {
 const allConstraints = [
   ...COSTS.map(cost => new CostConstraint({costs : [cost]})),
   ...ALPHABET.map(char => new TitleStartConstraint({chars: [char]})),
+  ...[...allCardTypes.values()].map(t => new TypeConstraint({ types: [t]})),
   ...[...allSubtypes.values()].map(subtype => new SubtypeConstraint({subtypes: [subtype]})),
   ...TITLE_WORDS.map(word => new TitleIncludesConstraint({parts: [word]})),
   ...INFLUENCE_COUNTS.map(inf => new InfluenceConstraint({costs: [inf]})),

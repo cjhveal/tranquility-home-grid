@@ -195,7 +195,7 @@ export class TypeConstraint extends CardConstraint<'type'> {
   getName() {
     const {types} = this.payload;
 
-    return types.join(', ');
+    return types.map(t => t[0].toUpperCase() + t.slice(1)).join(', ');
   }
 
   validate(card: NrdbCardT): undefined | string[] {

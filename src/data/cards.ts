@@ -43,10 +43,13 @@ export function getSubtypesForCard(card: NrdbCardT): string[] {
   return card.keywords.split(' - ');
 }
 
+export const allCardTypes = new Set<string>();
 export const allSubtypes = new Set<string>();
 export const cardsBySubtype: {[subtype: string]: Set<NrdbCardT>} = {};
 for (const card of allCards) {
   if (!card) continue;
+
+  allCardTypes.add(card.type_code);
 
   if (card.keywords) {
     const subtypes = card.keywords.split(' - ');
