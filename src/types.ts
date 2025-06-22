@@ -1,37 +1,99 @@
 import {Type, type Static} from '@sinclair/typebox';
 
-export enum SideCode {
-  Corp = "corp",
-  Runner = "runner",
-}
+export const allSideCodes = [
+  "corp",
+  "runner",
+] as const;
 
-export enum TypeCode {
-  Agenda = "agenda",
-  Asset = "asset",
-  Event = "event",
-  Hardware = "hardware",
-  Ice = "ice",
-  Identity = "identity",
-  Operation = "operation",
-  Program = "program",
-  Resource = "resource",
-  Upgrade = "upgrade",
-}
+export type TSideCode = typeof allSideCodes[number];
 
-export enum FactionCode {
-  Adam = "adam",
-  Anarch = "anarch",
-  Apex = "apex",
-  Criminal = "criminal",
-  HB = "haas-bioroid",
-  Jinteki = "jinteki",
-  NBN = "nbn",
-  NeutralCorp = "neutral-corp",
-  NeutralRunner = "neutral-runner",
-  Shaper = "shaper",
-  Sunny = "sunny-lebeau",
-  Weyland = "weyland-consortium",
-}
+export const allTypeCodes = [
+  "agenda",
+  "asset",
+  "event",
+  "hardware",
+  "ice",
+  "identity",
+  "operation",
+  "program",
+  "resource",
+  "upgrade",
+] as const;
+
+export type TTypeCode = typeof allTypeCodes[number];
+
+export const allFactionCodes = [
+  "adam",
+  "anarch",
+  "apex",
+  "criminal",
+  "haas-bioroid",
+  "jinteki",
+  "nbn",
+  "neutral-corp",
+  "neutral-runner",
+  "shaper",
+  "sunny-lebeau",
+  "weyland-consortium",
+] as const;
+
+export type TFactionCode = typeof allFactionCodes[number];
+
+export const allMiniFactionCodes: TFactionCode[] = [
+  "adam",
+  "apex",
+  "sunny-lebeau",
+] as const;
+
+export const allNeutralFactionCodes = [
+  "neutral-corp",
+  "neutral-runner",
+] as const;
+
+export const mainRunnerFactionCodes = [
+  "anarch",
+  "criminal",
+  "shaper",
+] as const;
+
+export const allRunnerFactionCodes = [
+  "anarch",
+  "criminal",
+  "shaper",
+  "neutral-runner",
+  ...allMiniFactionCodes,
+] as const;
+
+export const mainCorpFactionCodes = [
+  "haas-bioroid",
+  "jinteki",
+  "nbn",
+  "weyland-consortium",
+] as const;
+
+export const allCorpFactionCodes = [
+  "haas-bioroid",
+  "jinteki",
+  "nbn",
+  "neutral-corp",
+  "weyland-consortium",
+] as const;
+
+export const factionCodeToName: {[K in TFactionCode]: string} = Object.freeze({
+  "adam": "Adam",
+  "anarch": "Anarch",
+  "apex": "Apex",
+  "criminal": "Criminal",
+  "haas-bioroid": "HB",
+  "jinteki": "Jinteki",
+  "nbn": "NBN",
+  "neutral-corp": "NeutralCorp",
+  "neutral-runner": "NeutralRunner",
+  "shaper": "Shaper",
+  "sunny-lebeau": "Sunny",
+  "weyland-consortium": "Weyland",
+});
+
 
 /*
 {
@@ -56,6 +118,11 @@ export enum FactionCode {
   "uniqueness": false
 }*/
 
+export const FactionCodeType = Type.Union(
+  allFactionCodes.map(code => Type.Literal(code)),
+);
+
+
 export const NrdbCardType = Type.Object({
   advancement_cost: Type.Optional(Type.Union([
     Type.Number(),
@@ -69,7 +136,7 @@ export const NrdbCardType = Type.Object({
     Type.Null(),
   ])),
   deck_limit: Type.Number(),
-  faction_code: Type.Enum(FactionCode),
+  faction_code: FactionCodeType,
   faction_cost: Type.Number(),
   flavor: Type.Optional(Type.String()),
   illustrator: Type.Optional(Type.String()),
@@ -86,7 +153,9 @@ export const NrdbCardType = Type.Object({
   // potentially pull statically from packs.json
   pack_code: Type.String(),
   position: Type.Number(),
-  side_code: Type.Enum(SideCode),
+  side_code: Type.Union(
+    allSideCodes.map(code => Type.Literal(code)),
+  ),
   strength: Type.Optional(Type.Union([
     Type.Number(),
     Type.Null(),
@@ -96,7 +165,9 @@ export const NrdbCardType = Type.Object({
   trash_cost: Type.Optional(Type.Number()),
   stripped_text: Type.Optional(Type.String()),
   stripped_title: Type.String(),
-  type_code: Type.Enum(TypeCode), 
+  type_code: Type.Union(
+    allTypeCodes.map(code => Type.Literal(code))
+  ),
   uniqueness: Type.Boolean(),
 });
 
@@ -151,7 +222,7 @@ export const ConstraintSpecType = Type.Union([
   Type.Object({
     kind: Type.Literal('faction'),
     payload: Type.Object({
-      factions: Type.Array(Type.String()),
+      factions: Type.Array(FactionCodeType),
     })
   }),
   Type.Object({

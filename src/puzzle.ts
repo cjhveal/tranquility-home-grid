@@ -22,6 +22,16 @@ export type IncompletePuzzleConstraints = {
   [K in keyof PuzzleConstraints]: null | CardConstraint
 }
 
+export function makeBlankPuzzleConstraints() {
+  return {
+    "1": null,
+    "2": null,
+    "3": null,
+    "A": null,
+    "B": null,
+    "C": null,
+  }
+}
 
 
 
@@ -76,3 +86,6 @@ export function getBlankSolution(): TSolution {
     },
   }
 }
+
+
+

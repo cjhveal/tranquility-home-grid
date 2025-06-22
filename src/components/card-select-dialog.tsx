@@ -55,7 +55,7 @@ export function CardSelectDialog({
     return filteredCards.length;
   }, [cardsInFormat, firstConstraint, secondConstraint]);
 
-  const handleSelectCard = (card: NrdbCardT) => {
+  const handleSelectCard = (card: null | NrdbCardT) => {
     setSelectedCard(card);
   }
 
@@ -104,7 +104,7 @@ export function CardSelectDialog({
           )}
         >
           <CardSearch autoFocus cardsInFormat={cardsInFormat} onSelect={handleSelectCard} />
-          <Button variant="solid">Run</Button>
+          <Button variant="solid" type="submit">Run</Button>
         </form>
         <Description>
           Select a card that is both: <ConstraintText constraint={firstConstraint}/> and <ConstraintText constraint={secondConstraint} />

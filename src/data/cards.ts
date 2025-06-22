@@ -35,6 +35,42 @@ for (const rawCard of rawCardData.data) {
   }
 }
 
+export class CardStore {
+  allSubtypes: Set<string>;
+  cardsBySubtype: {[subtype: string]: Set<NrdbCardT>};
+  constructor(private cards: NrdbCardT[]) {
+    this.cards = cards;
+
+    this.allSubtypes = new Set<string>();
+    this.cardsBySubtype = {}
+
+    for (const card of this.cards) {
+      if (!card) continue;
+
+      if (card.keywords) {
+        const subtypes = card.keywords.split(' - ');
+        for (const subtype of subtypes) {
+          const set = this.cardsBySubtype[subtype] || new Set();
+          set.add(card);
+          this.cardsBySubtype[subtype] = set;
+
+          this.allSubtypes.add(subtype);
+        }
+      }
+    }
+  }
+
+  getAllCards() {
+    return this.cards;
+  }
+}
+
+export const cardStoreByFormat = {
+  'eternal': new CardStore(allCards),
+  'standard': new CardStore(cardsByFormat.standard),
+  'startup': new CardStore(cardsByFormat.startup),
+}
+
 export function getSubtypesForCard(card: NrdbCardT): string[] {
   if (!card.keywords) {
     return [];
@@ -43,13 +79,11 @@ export function getSubtypesForCard(card: NrdbCardT): string[] {
   return card.keywords.split(' - ');
 }
 
-export const allCardTypes = new Set<string>();
 export const allSubtypes = new Set<string>();
 export const cardsBySubtype: {[subtype: string]: Set<NrdbCardT>} = {};
+
 for (const card of allCards) {
   if (!card) continue;
-
-  allCardTypes.add(card.type_code);
 
   if (card.keywords) {
     const subtypes = card.keywords.split(' - ');
@@ -83,3 +117,5 @@ for (const card of allCards) {
 }
 
 export const cardsByTitleStartLetter = groupBy(allCards, (card) => card.stripped_title[0].toLowerCase());
+
+

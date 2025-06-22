@@ -1,3 +1,4 @@
+import { factionCodeToName } from '@/types';
 import type { NrdbCardT, TConstraintKind, TConstraintSpecByKind, PayloadOf } from '@/types';
 import { getSubtypesForCard } from '@/data/cards';
 
@@ -120,13 +121,14 @@ export class FactionConstraint extends CardConstraint<'faction'> {
   getName() {
     const {factions} = this.payload;
 
-    return `${factions.join(', ')}`;
+    const factionNames: string[] = factions.map(code => factionCodeToName[code]);
+
+    return `${factionNames.join(', ')}`;
   }
 
   validate(card: NrdbCardT): undefined | string[] {
     if (!this.predicate(card)) {
-      const { factions } = this.payload;
-      return [`does not have faction of ${factions.join(', ')}`]
+      return [`does not have faction of ${this.getName()}`]
     }
   }
 }

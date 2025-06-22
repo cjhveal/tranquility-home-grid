@@ -4,21 +4,24 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import {
   CardConstraint,
-  TitleStartConstraint,
   TitleIncludesConstraint,
-  CostConstraint,
-  FactionConstraint,
-  IllustratorConstraint,
-  UniqueConstraint,
-  TypeConstraint,
   SubtypeConstraint,
-  InfluenceConstraint,
 } from '@/constraints';
 
 import { type IncompletePuzzleConstraints } from '@/puzzle';
 
-import {allCards, cardsByFormat, allCardTypes, allSubtypes} from '@/data/cards';
+import {allCards, cardsByFormat, allSubtypes, cardStoreByFormat} from '@/data/cards';
 import type { NrdbCardT } from '@/types';
+
+import {
+  makeAllCostConstraints,
+  makeAllTitleStartConstraints,
+  makeAllInfluenceConstraints,
+  makeAllFactionConstraints,
+  makeAllTypeConstraints,
+
+  generatePuzzle,
+} from '@/game/generator';
 
 import {Button} from '@/components/button';
 
@@ -26,10 +29,8 @@ export const Route = createFileRoute('/sysop/builder')({
   component: RouteComponent,
 })
 
-const COSTS = [0,1,2,3,4,5];
-const ALPHABET = Array.from({ length: 26}, (v, n) => String.fromCharCode(n + 97));
 const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test", "2", "3"]
-const INFLUENCE_COUNTS = [0,1,2,3,4,5];
+
  
 
 interface BuilderGridBaseCellProps extends React.PropsWithChildren{
@@ -46,12 +47,13 @@ function BuilderGridBaseCell(props: BuilderGridBaseCellProps) {
 }
 
 const allConstraints = [
-  ...COSTS.map(cost => new CostConstraint({costs : [cost]})),
-  ...ALPHABET.map(char => new TitleStartConstraint({chars: [char]})),
-  ...[...allCardTypes.values()].map(t => new TypeConstraint({ types: [t]})),
+  ...makeAllCostConstraints(),
+  ...makeAllTitleStartConstraints(),
+  ...makeAllTypeConstraints(),
   ...[...allSubtypes.values()].map(subtype => new SubtypeConstraint({subtypes: [subtype]})),
   ...TITLE_WORDS.map(word => new TitleIncludesConstraint({parts: [word]})),
-  ...INFLUENCE_COUNTS.map(inf => new InfluenceConstraint({costs: [inf]})),
+  ...makeAllInfluenceConstraints(),
+  ...makeAllFactionConstraints(),
 ];
 
 interface BuilderGridHeaderProps extends React.PropsWithChildren {
@@ -149,15 +151,19 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
 }
 
 function RouteComponent() {
+  const puzzle = React.useMemo(() => generatePuzzle(cardStoreByFormat.standard), [cardStoreByFormat.standard]);
+
   const [selectedId, setSelectedId] = React.useState("1");
-  const [constraintMap, setConstraintMap] = React.useState<IncompletePuzzleConstraints>({
+  const [constraintMap, setConstraintMap] =  React.useState<IncompletePuzzleConstraints>(puzzle.constraints);
+  /*
+  React.useState<IncompletePuzzleConstraints>({
     "1": null,
     "2": null,
     "3": null,
     "A": null,
     "B": null,
     "C": null,
-  });
+  });*/
 
   const selectConstraint = (constraint: CardConstraint) => {
     const nextMap = {...constraintMap, [selectedId]: constraint}
