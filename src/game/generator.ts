@@ -148,6 +148,16 @@ class PuzzleValidator {
     this.cards = cards;
     this.constraints = constraints;
   }
+
+  shuffleRows() {
+    const rowKeys = ["1", "2", "3"] as const;
+    const shuffledKeys = shuffle(rowKeys);
+
+    const shuffledRow = shuffledKeys.map(row => this.constraints[row]);
+    for (const [i, row] of rowKeys.entries()) {
+      this.setConstraint(row, shuffledRow[i]);
+    }
+  }
   
   intersectConstraint(col: TColKey, row: TRowKey) {
     const colConstraint = this.constraints[col];
@@ -239,7 +249,7 @@ class PuzzleValidator {
     return true;
   }
 
-  setConstraint(key: TColKey | TRowKey, constraint: CardConstraint) {
+  setConstraint(key: TColKey | TRowKey, constraint: null | CardConstraint) {
     this.constraints[key] = constraint;
   }
 }
@@ -269,7 +279,7 @@ function choose<T>(n: number, list: T[]): T[] {
   return chosen;
 }
 
-function shuffle<T>(list: T[]): T[] {
+function shuffle<T>(list: readonly T[]): T[] {
   const next = [...list];
   for (let i = next.length - 1; i >= 1; i--) {
     const j = randomInt(i+1);
@@ -377,6 +387,7 @@ export function generatePuzzle(store: CardStore) {
   generateAllColumnConstraints(puzzle);
   
 
+  puzzle.shuffleRows();
   console.log(puzzle.constraints);
 
   return puzzle;
