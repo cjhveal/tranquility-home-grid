@@ -46,7 +46,7 @@ function BuilderGridBaseCell(props: BuilderGridBaseCellProps) {
   />
 }
 
-const allConstraints = [
+const allConstraints: CardConstraint[] = [
   ...makeAllCostConstraints(),
   ...makeAllTitleStartConstraints(),
   ...makeAllTypeConstraints(),
@@ -150,6 +150,39 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
   </div>
 }
 
+interface ConstraintsTableProps {
+  constraints: CardConstraint[],
+  selectConstraint: (c: CardConstraint) => void,
+}
+function ConstraintsTable({constraints, selectConstraint}: ConstraintsTableProps) {
+  return (
+    <table className="mx-auto max-w-2xl">
+      <thead>
+        <tr>
+          <th>Constraint</th>
+          <th>Eternal</th>
+          <th>Standard</th>
+          <th>Startup</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {constraints.map(constraint => {
+          const name = constraint.getName();
+          return (
+            <tr key={name} onClick={() => selectConstraint(constraint)}>
+              <td>{name}</td>
+              <td>{constraint.filter(allCards).length}</td>
+              <td>{constraint.filter(cardsByFormat.standard).length}</td>
+              <td>{constraint.filter(cardsByFormat.startup).length}</td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  )
+}
+
 function RouteComponent() {
   const puzzle = React.useMemo(() => generatePuzzle(cardStoreByFormat.standard), [cardStoreByFormat.standard]);
 
@@ -165,10 +198,9 @@ function RouteComponent() {
     "C": null,
   });*/
 
-  const selectConstraint = (constraint: CardConstraint) => {
-    const nextMap = {...constraintMap, [selectedId]: constraint}
-    setConstraintMap(nextMap)
-  }
+  const selectConstraint = React.useCallback((constraint: CardConstraint) => {
+    setConstraintMap(state => ({...state, [selectedId]: constraint}))
+  }, [setConstraintMap]);
 
   const getPuzzleSpec = () => {
     if (constraintMap["1"] && constraintMap["2"] && constraintMap["3"] && constraintMap["A"] && constraintMap["B"] && constraintMap["C"]) {
@@ -219,27 +251,8 @@ function RouteComponent() {
       Copy Puzzle Spec
     </Button>
 
-    <table className="mx-auto max-w-2xl">
-      <thead>
-        <tr>
-          <th>Constraint</th>
-          <th>Eternal</th>
-          <th>Standard</th>
-          <th>Startup</th>
-        </tr>
-      </thead>
+    <ConstraintsTable constraints={allConstraints} selectConstraint={selectConstraint} />
 
-      <tbody>
-      {allConstraints.map(constraint => (
-        <tr onClick={() => selectConstraint(constraint)}>
-          <td>{constraint.getName()}</td>
-          <td>{constraint.filter(allCards).length}</td>
-          <td>{constraint.filter(cardsByFormat.standard).length}</td>
-          <td>{constraint.filter(cardsByFormat.startup).length}</td>
-        </tr>
-      ))}
-      </tbody>
-    </table>
 
   </div>
 }

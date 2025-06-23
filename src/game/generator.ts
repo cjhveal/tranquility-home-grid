@@ -26,7 +26,6 @@
 
 import { 
   allTypeCodes,
-  allFactionCodes,
   mainRunnerFactionCodes,
   mainCorpFactionCodes,
 } from '@/types';
@@ -34,16 +33,13 @@ import type {
   NrdbCardT,
   TColKey,
   TRowKey,
-  TFactionCode,
 } from '@/types';
 
 import {
   CardConstraint,
   TitleStartConstraint,
-  TitleIncludesConstraint,
   CostConstraint,
   FactionConstraint,
-  IllustratorConstraint,
   UniqueConstraint,
   TypeConstraint,
   SubtypeConstraint,
@@ -61,8 +57,8 @@ import {
 
 
 const COSTS = [0,1,2,3,4,5];
-const ALPHABET = Array.from({ length: 26}, (v, n) => String.fromCharCode(n + 97));
-const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test", "1", "2", "3"]
+const ALPHABET = Array.from({ length: 26}, (_, n) => String.fromCharCode(n + 97));
+//const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test", "1", "2", "3"]
 const INFLUENCE_COUNTS = [0,1,2,3,4,5];
 
 /*
@@ -149,6 +145,14 @@ class PuzzleValidator {
     this.constraints = constraints;
   }
 
+  setConstraint(key: TColKey | TRowKey, constraint: null | CardConstraint) {
+    this.constraints[key] = constraint;
+  }
+
+  clearConstraints() {
+    this.constraints = makeBlankPuzzleConstraints();
+  }
+
   shuffleRows() {
     const rowKeys = ["1", "2", "3"] as const;
     const shuffledKeys = shuffle(rowKeys);
@@ -219,6 +223,9 @@ class PuzzleValidator {
     return sets;
   }
 
+  hasAllConstraints() {
+    return Boolean(this.constraints["1"] && this.constraints["2"] && this.constraints["3"] && this.constraints["A"] && this.constraints["B"] && this.constraints["C"]);
+  }
 
   validateGrid() {
     const colKeys = ["A", "B", "C"] as const;
@@ -247,10 +254,6 @@ class PuzzleValidator {
     }
 
     return true;
-  }
-
-  setConstraint(key: TColKey | TRowKey, constraint: null | CardConstraint) {
-    this.constraints[key] = constraint;
   }
 }
 
@@ -283,7 +286,6 @@ function shuffle<T>(list: readonly T[]): T[] {
   const next = [...list];
   for (let i = next.length - 1; i >= 1; i--) {
     const j = randomInt(i+1);
-    console.log(i, j)
     const tmp = next[j];
     next[j] = next[i];
     next[i] = tmp;
@@ -305,7 +307,7 @@ function generateColumnConstraint(col: TColKey, puzzle: PuzzleValidator, constra
   });
 
   
-  const filteredConstraints = constraints.filter((constraint, i) => {
+  const filteredConstraints = constraints.filter((_, i) => {
     const row = rowIntersections[i];
 
     const sets = row.map(items => new Set(items))
@@ -344,7 +346,6 @@ function generateAllColumnConstraints(puzzle: PuzzleValidator) {
   });
 
   for (const [i, col] of cols.entries()) {
-    console.log(constraintKinds[i]);
     const constraint = generateColumnConstraint(col, puzzle, allConstraints[i]);
     puzzle.setConstraint(col, constraint);
   }
@@ -354,41 +355,47 @@ const MAX_GENERATION_ATTEMPTS = 1e3;
 export function generatePuzzle(store: CardStore) {
   const cards = store.getAllCards();
   const puzzle = new PuzzleValidator(cards);
-  
 
-  const typeConstraints = makeAllTypeConstraints();
-  const chosenTypeConstraint = sample(typeConstraints);
+  let attemptCount = 0;
+  while (attemptCount < MAX_GENERATION_ATTEMPTS) {
+    attemptCount += 1;
+    console.log('generating...', attemptCount);
 
-  puzzle.setConstraint("1", chosenTypeConstraint);
+    const typeConstraints = makeAllTypeConstraints();
+    const chosenTypeConstraint = sample(typeConstraints);
+
+    puzzle.setConstraint("1", chosenTypeConstraint);
 
 
-  const subTypeGroups = []
-  for (const [subtype, subtypeSet] of Object.entries(store.cardsBySubtype)) {
-    subTypeGroups.push({subtype, set: subtypeSet});
-  }
+    const subTypeGroups = []
+    for (const [subtype, subtypeSet] of Object.entries(store.cardsBySubtype)) {
+      subTypeGroups.push({subtype, set: subtypeSet});
+    }
 
-  /*
+    /*
   subTypeGroups.sort((a, b) => {
     return b.set.size - a.set.size
   });
   */
 
-  const filteredSubtypes = subTypeGroups.filter(group => {
-    return group.set.size >= SUBTYPE_GROUP_SIZE_THRESHOLD;
-  });
+    const filteredSubtypes = subTypeGroups.filter(group => {
+      return group.set.size >= SUBTYPE_GROUP_SIZE_THRESHOLD;
+    });
 
-  const firstSubtypeGroup = sample(filteredSubtypes);
-  const secondSubtypeGroup = sample(filteredSubtypes);
+    const firstSubtypeGroup = sample(filteredSubtypes);
+    const secondSubtypeGroup = sample(filteredSubtypes);
 
-  puzzle.setConstraint("2", new SubtypeConstraint({subtypes: [firstSubtypeGroup.subtype]}));
-  puzzle.setConstraint("3", new SubtypeConstraint({subtypes: [secondSubtypeGroup.subtype]}));
+    puzzle.setConstraint("2", new SubtypeConstraint({subtypes: [firstSubtypeGroup.subtype]}));
+    puzzle.setConstraint("3", new SubtypeConstraint({subtypes: [secondSubtypeGroup.subtype]}));
 
 
-  generateAllColumnConstraints(puzzle);
-  
+    generateAllColumnConstraints(puzzle);
 
-  puzzle.shuffleRows();
-  console.log(puzzle.constraints);
+    if (puzzle.hasAllConstraints()) {
+      puzzle.shuffleRows();
+      return puzzle;
+    }
+  }
 
   return puzzle;
 }
