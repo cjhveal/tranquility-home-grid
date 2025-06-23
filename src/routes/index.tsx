@@ -10,12 +10,12 @@ export const Route = createFileRoute('/')({
 function App() {
   return (<Page>
     <div className="flex flex-col justify-center items-center text-center p-8 gap-4">
-      <div className="text-2xl md:text-3xl dark:text-violet-200">
+      <div className="text-2xl md:text-3xl font-medium dark:text-violet-200">
         Tranquility Home Grid
       </div>
       <img 
         src="logo192.png" 
-        className="size-64"
+        className="size-48"
       />
 
       <Button>

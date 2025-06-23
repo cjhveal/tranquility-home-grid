@@ -186,6 +186,12 @@ function RouteComponent() {
     }
   }
 
+  const handleGeneratePuzzle = () => {
+    const newPuzzle = generatePuzzle(cardStoreByFormat.standard);
+
+    setConstraintMap(newPuzzle.constraints);
+  }
+
   const handleCopyPuzzleSpec = () => {
     const spec = getPuzzleSpec();
 
@@ -206,6 +212,9 @@ function RouteComponent() {
       constraintMap={constraintMap}
     />
 
+    <Button onClick={handleGeneratePuzzle}>
+      Generate Puzzle
+    </Button>
     <Button onClick={handleCopyPuzzleSpec}>
       Copy Puzzle Spec
     </Button>

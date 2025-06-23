@@ -75,13 +75,31 @@ export function makeAllCostConstraints() {
   return COSTS.map(cost => new CostConstraint({costs : [cost]}));
 }
 
-export function makeAllTitleStartConstraints() {
-  return ALPHABET.map(char => new TitleStartConstraint({chars: [char]}));
-}
-
 export function makeAllInfluenceConstraints() {
   return INFLUENCE_COUNTS.map(inf => new InfluenceConstraint({costs: [inf]}));
 }
+
+export function makeAllTitleStartConstraints() {
+  return [
+    ...ALPHABET.map(char => new TitleStartConstraint({chars: [char]})),
+    ...makeAllTitleStartPairConstraints(),
+  ];
+}
+
+export function makeAllTitleStartPairConstraints() {
+  const constraints: TitleStartConstraint[] = [];
+
+  for (let i = 0; i < ALPHABET.length-1; i++) {
+    for (let j = i+1; j < ALPHABET.length; j++) {
+      const charA = ALPHABET[i];
+      const charB = ALPHABET[j];
+      constraints.push(new TitleStartConstraint({chars: [charA, charB]}));
+    }
+  }
+
+  return constraints;
+}
+
 
 export function makeAllFactionConstraints() {
   const constraints: FactionConstraint[] = [];
@@ -92,6 +110,13 @@ export function makeAllFactionConstraints() {
   }
 
   return constraints;
+}
+
+export function makeAllUnqiuenessConstraints() {
+  return [
+    new UniqueConstraint({unique: true}),
+    new UniqueConstraint({unique: false}),
+  ];
 }
 
 export function makeAllColConstraintCandidates() {
@@ -111,6 +136,7 @@ const generatorByKind: {[kind: string]: () => CardConstraint[]} = {
   'faction': makeAllFactionConstraints,
   'influence': makeAllInfluenceConstraints,
   'titleStart': makeAllTitleStartConstraints,
+  'unique': makeAllUnqiuenessConstraints,
 }
 
 
@@ -256,9 +282,9 @@ function shuffle<T>(list: T[]): T[] {
   return next;
 }
 
-const SUBTYPE_GROUP_SIZE_THRESHOLD = 9;
-const ROW_SIZE_THRESHOLD = 6;
-const INTERSECTION_SIZE_THRESHOLD = 3;
+const SUBTYPE_GROUP_SIZE_THRESHOLD = 12;
+const ROW_SIZE_THRESHOLD = 5;
+const INTERSECTION_SIZE_THRESHOLD = 2;
 
 
 function generateColumnConstraint(col: TColKey, puzzle: PuzzleValidator, constraints: CardConstraint[]) {
@@ -286,7 +312,13 @@ function generateColumnConstraint(col: TColKey, puzzle: PuzzleValidator, constra
   return sample(filteredConstraints);
 }
 
-const COL_CONSTRAINT_KINDS = ['cost', 'influence', 'titleStart', 'faction'];
+const COL_CONSTRAINT_KINDS = [
+  'cost',
+ 'influence',
+ 'titleStart',
+ 'faction',
+// 'unique',
+];
 function generateAllColumnConstraints(puzzle: PuzzleValidator) {
   const cols = ["A", "B", "C"] as const;
   const constraintKinds = choose(3, COL_CONSTRAINT_KINDS);
@@ -308,6 +340,7 @@ function generateAllColumnConstraints(puzzle: PuzzleValidator) {
   }
 }
 
+const MAX_GENERATION_ATTEMPTS = 1e3;
 export function generatePuzzle(store: CardStore) {
   const cards = store.getAllCards();
   const puzzle = new PuzzleValidator(cards);
@@ -324,9 +357,11 @@ export function generatePuzzle(store: CardStore) {
     subTypeGroups.push({subtype, set: subtypeSet});
   }
 
+  /*
   subTypeGroups.sort((a, b) => {
     return b.set.size - a.set.size
   });
+  */
 
   const filteredSubtypes = subTypeGroups.filter(group => {
     return group.set.size >= SUBTYPE_GROUP_SIZE_THRESHOLD;

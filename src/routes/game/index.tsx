@@ -6,7 +6,8 @@ import type {NrdbCardT, TConstraintKey, TColKey, TRowKey} from '@/types';
 import { CardConstraint } from '@/constraints';
 import {
   parsePuzzleSpec,
-  EXAMPLE_PUZZLE_1,
+  EXAMPLE_PUZZLE_3,
+  EXAMPLE_PUZZLE_4,
   getBlankSolution,
 
   type TSolution,
@@ -24,7 +25,7 @@ function getCurrentFormatCards() {
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
   loader: () => {
-    const puzzle =  parsePuzzleSpec(EXAMPLE_PUZZLE_1);
+    const puzzle =  parsePuzzleSpec(EXAMPLE_PUZZLE_4);
 
     return {puzzle};
   }

@@ -14,6 +14,7 @@ import {type PuzzleConstraints} from '@/puzzle';
 import { Button } from '@/components/button';
 import {
   Dialog,
+  DialogTitle,
   DialogBackdrop,
   DialogPanel,
 } from '@/components/dialog'
@@ -96,6 +97,9 @@ export function CardSelectDialog({
 
     <DialogPanel>
       <div className="flex flex-col items-center space-y-4">
+        <DialogTitle>
+          Select a card that is both: <ConstraintText constraint={firstConstraint}/> and <ConstraintText constraint={secondConstraint} />
+        </DialogTitle>
         <form 
           onSubmit={handleSubmitCard}
           className={clsx(
@@ -106,11 +110,8 @@ export function CardSelectDialog({
           <CardSearch autoFocus cardsInFormat={cardsInFormat} onSelect={handleSelectCard} />
           <Button variant="solid" type="submit">Run</Button>
         </form>
-        <Description>
-          Select a card that is both: <ConstraintText constraint={firstConstraint}/> and <ConstraintText constraint={secondConstraint} />
-        </Description>
 
-        <div>{answerCount} possible answers in Standard format</div>
+        <Description>{answerCount} possible answers in Standard format</Description>
       </div>
     </DialogPanel>
   </Dialog>
