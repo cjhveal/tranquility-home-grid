@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import clsx from 'clsx';
+import { createLink, type LinkComponent } from '@tanstack/react-router';
 import { Button as HeadlessButton } from '@headlessui/react';
 
 export type ButtonColor =
@@ -34,17 +35,20 @@ const BUTTON_VARIANTS: {
     "gray": "inset-ring",
   },
 }
+const BUTTON_BASE_CLASSES = 'px-2 rounded cursor-pointer font-medium';
 
-type BaseButtonProps = {
-  
-}
-
-export type ButtonProps = {
+interface BaseButtonProps {
   variant?: ButtonVariant,
   buttonColor?: ButtonColor,
-} & React.ComponentProps<typeof HeadlessButton>;
+}
+
+function getButtonVariantClasses(variant: ButtonVariant, buttonColor: ButtonColor) {
+  return BUTTON_VARIANTS[variant][buttonColor];
+}
+
+export interface ButtonProps extends BaseButtonProps, React.ComponentProps<typeof HeadlessButton> {};
 export function Button({variant = "solid", buttonColor = "gray", className, ...rest}: ButtonProps) {
-  const variantClasses = BUTTON_VARIANTS[variant][buttonColor];
+  const variantClasses = getButtonVariantClasses(variant, buttonColor);
 
   return (
     <HeadlessButton
@@ -52,8 +56,37 @@ export function Button({variant = "solid", buttonColor = "gray", className, ...r
       className={clsx(
         className,
         variantClasses,
-        'px-2 rounded cursor-pointer font-medium'
+        BUTTON_BASE_CLASSES,
+
       )}
     />
   );
+}
+
+interface BaseButtonLinkProps extends BaseButtonProps, React.AnchorHTMLAttributes<HTMLAnchorElement> {}
+const BaseButtonLinkComponent = React.forwardRef<HTMLAnchorElement, BaseButtonLinkProps>(
+  (props, ref) => {
+    const {variant = "solid", buttonColor="gray", className, ...rest} = props;
+
+    const variantClasses = getButtonVariantClasses(variant, buttonColor);
+
+    return (
+      <a 
+        {...rest}
+        ref={ref}
+        className={clsx(
+          className,
+          variantClasses,
+          BUTTON_BASE_CLASSES,
+        )}
+      />
+    );
+  }
+);
+
+const CreatedLinkComponent = createLink(BaseButtonLinkComponent);
+
+
+export const ButtonLink: LinkComponent<typeof BaseButtonLinkComponent> = (props) => {
+  return <CreatedLinkComponent preload="intent" {...props} />
 }

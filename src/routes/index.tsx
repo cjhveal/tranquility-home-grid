@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Page } from '@/components/page';
-import { Button } from '@/components/button';
+import { ButtonLink } from '@/components/button';
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -18,9 +18,9 @@ function App() {
         className="size-48"
       />
 
-      <Button>
+      <ButtonLink to={'/game'}>
         Play Daily
-      </Button>
+      </ButtonLink>
     </div>
   </Page>)
 }
