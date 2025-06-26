@@ -1,12 +1,12 @@
 import * as React from 'react';
 
+import clsx from 'clsx';
 import { createFileRoute } from '@tanstack/react-router'
 
-import type {NrdbCardT, TConstraintKey, TColKey, TRowKey} from '@/types';
-import { CardConstraint } from '@/constraints';
+import type {NrdbCardT, TColKey, TRowKey} from '@/types';
 import {
   parsePuzzleSpec,
-  EXAMPLE_PUZZLE_3,
+  //EXAMPLE_PUZZLE_3,
   EXAMPLE_PUZZLE_4,
   getBlankSolution,
 
@@ -32,6 +32,14 @@ export const Route = createFileRoute('/game/')({
 })
 
 
+const GAME_CELL_BACKGROUNDS = {
+  "red": "bg-linear-to-br from-red-700 to-amber-800",
+  "green": "bg-linear-to-r from-green-700 to-teal-600",
+  "blue": "bg-linear-to-b from-cyan-600 to-blue-800",
+  "violet-linear": "bg-linear-to-tr from-black from-10% to-violet-950",
+  "violet": "bg-radial-[at_10%_100%] from-violet-950 to-black",
+  "ultraviolet": "ultraviolet-background-animation"
+}
 
 interface GameCellProps {
   col: TColKey,
@@ -42,6 +50,8 @@ interface GameCellProps {
 function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
   const currentSolution = solution[col][row];
 
+  const title = currentSolution?.title;
+
   const handleOpenDialog = React.useCallback(() => {
     if (!currentSolution) {
       onOpenDialog(col, row);
@@ -49,10 +59,15 @@ function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
   }, [currentSolution, onOpenDialog]);
   return <div 
     role="button" 
-    className="flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer"
+    className={clsx(
+      "flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer",
+      //GAME_CELL_BACKGROUNDS["ultraviolet"]
+    )}
     onClick={handleOpenDialog}
   >
-    {currentSolution?.title}
+    {title && (<span className="bg-black/40 rounded-md p-1">
+      {title}
+    </span>)}
   </div>
 }
 
