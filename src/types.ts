@@ -199,6 +199,25 @@ export const NrdbPackType = Type.Object({
 
 export type NrdbPackT = Static<typeof NrdbPackType>;
 
+export const allFormatCodes = [
+  'eternal',
+  'standard',
+  'startup',
+] as const;
+
+export type TFormatCode = typeof allFormatCodes[number];
+
+export interface FormatData {
+  cards: NrdbCardT[];
+  packs: NrdbPackT[];
+  format: TFormatCode;
+  allSubtypes: Set<string>;
+  cardsBySubtype: {[subtype: string]: Set<NrdbCardT>};
+}
+
+export type NrdbDataByFormat = {
+  [F in TFormatCode]: FormatData
+}
 
 export const ConstraintSpecType = Type.Union([
   Type.Object({

@@ -33,6 +33,7 @@ import type {
   NrdbCardT,
   TColKey,
   TRowKey,
+  FormatData
 } from '@/types';
 
 import {
@@ -50,11 +51,6 @@ import {
   type IncompletePuzzleConstraints,
   makeBlankPuzzleConstraints,
 } from "@/puzzle";
-
-import {
-  CardStore
-} from '@/data/cards';
-
 
 const COSTS = [0,1,2,3,4,5];
 const ALPHABET = Array.from({ length: 26}, (_, n) => String.fromCharCode(n + 97));
@@ -115,17 +111,17 @@ export function makeAllUnqiuenessConstraints() {
   ];
 }
 
-export function makeAllColConstraintCandidates() {
-  
-}
 
 export function makeAllTypeConstraints() {
   return allTypeCodes.map(t => new TypeConstraint({ types: [t]}));
 }
 
-export function makeAllRowConstraintCandidates() {
-   
+export function makeAllSubtypeConstraints(data: FormatData) {
+  return [...data.allSubtypes.values()]
+    .map(subtype => new SubtypeConstraint({subtypes: [subtype]}));
 }
+
+
 
 const generatorByKind: {[kind: string]: () => CardConstraint[]} = {
   'cost': makeAllCostConstraints,
@@ -352,8 +348,8 @@ function generateAllColumnConstraints(puzzle: PuzzleValidator) {
 }
 
 const MAX_GENERATION_ATTEMPTS = 1e3;
-export function generatePuzzle(store: CardStore) {
-  const cards = store.getAllCards();
+export function generatePuzzle(store: FormatData) {
+  const cards = store.cards;
   const puzzle = new PuzzleValidator(cards);
 
   let attemptCount = 0;

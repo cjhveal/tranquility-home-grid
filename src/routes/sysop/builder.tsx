@@ -2,16 +2,17 @@ import React from 'react';
 
 import { createFileRoute } from '@tanstack/react-router'
 
+import type { 
+  NrdbCardT,
+  NrdbDataByFormat,
+} from '@/types';
+
 import {
   CardConstraint,
   TitleIncludesConstraint,
-  SubtypeConstraint,
 } from '@/constraints';
 
 import { type IncompletePuzzleConstraints } from '@/puzzle';
-
-import {allCards, cardsByFormat, allSubtypes, cardStoreByFormat} from '@/data/cards';
-import type { NrdbCardT } from '@/types';
 
 import {
   makeAllCostConstraints,
@@ -19,14 +20,22 @@ import {
   makeAllInfluenceConstraints,
   makeAllFactionConstraints,
   makeAllTypeConstraints,
+  makeAllSubtypeConstraints,
 
   generatePuzzle,
 } from '@/game/generator';
 
 import {Button} from '@/components/button';
 
+import {fetchNrdbData} from '@/utils/nrdbData';
+
 export const Route = createFileRoute('/sysop/builder')({
   component: RouteComponent,
+  loader: async () => {
+    const dataByFormat = await fetchNrdbData()
+
+    return {dataByFormat}
+  },
 })
 
 const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test", "2", "3"]
@@ -46,15 +55,6 @@ function BuilderGridBaseCell(props: BuilderGridBaseCellProps) {
   />
 }
 
-const allConstraints: CardConstraint[] = [
-  ...makeAllCostConstraints(),
-  ...makeAllTitleStartConstraints(),
-  ...makeAllTypeConstraints(),
-  ...[...allSubtypes.values()].map(subtype => new SubtypeConstraint({subtypes: [subtype]})),
-  ...TITLE_WORDS.map(word => new TitleIncludesConstraint({parts: [word]})),
-  ...makeAllInfluenceConstraints(),
-  ...makeAllFactionConstraints(),
-];
 
 interface BuilderGridHeaderProps extends React.PropsWithChildren {
   selectedId?: string,
@@ -96,8 +96,9 @@ interface BuilderGridProps {
   selectedId: string,
   onSelectId: (id: string) => void,
   constraintMap: Record<string, CardConstraint | null>,
+  dataByFormat: NrdbDataByFormat,
 }
-function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) {
+function BuilderGrid({selectedId, onSelectId, constraintMap, dataByFormat}: BuilderGridProps) {
 
   const intersectConstraints = (firstId: string|null, secondId: string|null) => {
     const firstConstraint = firstId && constraintMap[firstId];
@@ -119,9 +120,9 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
 
     if (filterCards) {
       return {
-        eternal: filterCards(allCards).length,
-        standard: filterCards(cardsByFormat.standard).length,
-        startup: filterCards(cardsByFormat.startup).length,
+        eternal: filterCards(dataByFormat.eternal.cards).length,
+        standard: filterCards(dataByFormat.standard.cards).length,
+        startup: filterCards(dataByFormat.startup.cards).length,
       }
       
     }
@@ -153,8 +154,9 @@ function BuilderGrid({selectedId, onSelectId, constraintMap}: BuilderGridProps) 
 interface ConstraintsTableProps {
   constraints: CardConstraint[],
   selectConstraint: (c: CardConstraint) => void,
+  dataByFormat: NrdbDataByFormat,
 }
-function ConstraintsTable({constraints, selectConstraint}: ConstraintsTableProps) {
+function ConstraintsTable({constraints, selectConstraint, dataByFormat}: ConstraintsTableProps) {
   return (
     <table className="mx-auto max-w-2xl">
       <thead>
@@ -172,9 +174,9 @@ function ConstraintsTable({constraints, selectConstraint}: ConstraintsTableProps
           return (
             <tr key={name} onClick={() => selectConstraint(constraint)}>
               <td>{name}</td>
-              <td>{constraint.filter(allCards).length}</td>
-              <td>{constraint.filter(cardsByFormat.standard).length}</td>
-              <td>{constraint.filter(cardsByFormat.startup).length}</td>
+              <td>{constraint.filter(dataByFormat.eternal.cards).length}</td>
+              <td>{constraint.filter(dataByFormat.standard.cards).length}</td>
+              <td>{constraint.filter(dataByFormat.startup.cards).length}</td>
             </tr>
           )
         })}
@@ -184,19 +186,22 @@ function ConstraintsTable({constraints, selectConstraint}: ConstraintsTableProps
 }
 
 function RouteComponent() {
-  const puzzle = React.useMemo(() => generatePuzzle(cardStoreByFormat.standard), [cardStoreByFormat.standard]);
+  const {dataByFormat} = Route.useLoaderData();
+
+  const puzzle = React.useMemo(() => generatePuzzle(dataByFormat.standard), [dataByFormat.standard]);
+
+  const allConstraints = React.useMemo<CardConstraint[]>(() => [
+  ...makeAllCostConstraints(),
+  ...makeAllTitleStartConstraints(),
+  ...makeAllTypeConstraints(),
+  ...makeAllSubtypeConstraints(dataByFormat.eternal),
+  ...TITLE_WORDS.map(word => new TitleIncludesConstraint({parts: [word]})),
+  ...makeAllInfluenceConstraints(),
+  ...makeAllFactionConstraints(),
+], [dataByFormat]);
 
   const [selectedId, setSelectedId] = React.useState("1");
   const [constraintMap, setConstraintMap] =  React.useState<IncompletePuzzleConstraints>(puzzle.constraints);
-  /*
-  React.useState<IncompletePuzzleConstraints>({
-    "1": null,
-    "2": null,
-    "3": null,
-    "A": null,
-    "B": null,
-    "C": null,
-  });*/
 
   const selectConstraint = React.useCallback((constraint: CardConstraint) => {
     setConstraintMap(state => ({...state, [selectedId]: constraint}))
@@ -219,7 +224,7 @@ function RouteComponent() {
   }
 
   const handleGeneratePuzzle = () => {
-    const newPuzzle = generatePuzzle(cardStoreByFormat.standard);
+    const newPuzzle = generatePuzzle(dataByFormat.standard);
 
     setConstraintMap(newPuzzle.constraints);
   }
@@ -242,6 +247,7 @@ function RouteComponent() {
       selectedId={selectedId}
       onSelectId={setSelectedId}
       constraintMap={constraintMap}
+      dataByFormat={dataByFormat}
     />
 
     <Button onClick={handleGeneratePuzzle}>
@@ -251,7 +257,11 @@ function RouteComponent() {
       Copy Puzzle Spec
     </Button>
 
-    <ConstraintsTable constraints={allConstraints} selectConstraint={selectConstraint} />
+    <ConstraintsTable 
+      constraints={allConstraints}
+      selectConstraint={selectConstraint}
+      dataByFormat={dataByFormat}
+    />
 
 
   </div>

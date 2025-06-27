@@ -15,19 +15,17 @@ import {
 
 import { Page } from '@/components/page';
 import { CardSelectDialog } from '@/components/card-select-dialog';
-import {cardsByFormat} from '@/data/cards';
 
-// @TODO: Base this on format state
-function getCurrentFormatCards() {
-  return cardsByFormat['standard'];
-}
+import {fetchNrdbData} from '@/utils/nrdbData';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
-  loader: () => {
+  loader: async () => {
     const puzzle =  parsePuzzleSpec(EXAMPLE_PUZZLE_4);
 
-    return {puzzle};
+    const dataByFormat = await fetchNrdbData();
+
+    return {puzzle, dataByFormat};
   }
 })
 
@@ -37,7 +35,7 @@ const GAME_CELL_BACKGROUNDS = {
   "green": "bg-linear-to-r from-green-700 to-teal-600",
   "blue": "bg-linear-to-b from-cyan-600 to-blue-800",
   "violet-linear": "bg-linear-to-tr from-black from-10% to-violet-950",
-  "violet": "bg-radial-[at_10%_100%] from-violet-950 to-black",
+  "violet": "bg-radial-[at_10%_100%] from-violet-950 to-black animate-radial-pulse",
   "ultraviolet": "ultraviolet-background-animation"
 }
 
@@ -61,7 +59,7 @@ function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
     role="button" 
     className={clsx(
       "flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer",
-      //GAME_CELL_BACKGROUNDS["ultraviolet"]
+      GAME_CELL_BACKGROUNDS["violet"]
     )}
     onClick={handleOpenDialog}
   >
@@ -86,8 +84,9 @@ interface CardDialogState {
 }
 
 function RouteComponent() {
-  const {puzzle} = Route.useLoaderData();
-  const cardsInFormat = React.useMemo(() => getCurrentFormatCards(), []);
+  const {puzzle, dataByFormat} = Route.useLoaderData();
+
+  const cardsInFormat = dataByFormat.standard.cards;
 
   const [cardDialogState, setCardDialogState] = React.useState<CardDialogState>({
     isOpen: false,

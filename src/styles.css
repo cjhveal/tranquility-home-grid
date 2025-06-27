@@ -2,6 +2,7 @@
 
 @theme {
   --animate-shake: shake 0.2s ease-in-out 0s 2;
+  --animate-radial-pulse: radial-pulse 6s ease-in-out 0s infinite;
 
   @keyframes shake {
     0% {
@@ -18,6 +19,16 @@
     }
     100% {
       transform: translateX(0rem);
+    }
+  }
+
+  @keyframes radial-pulse {
+    0%, 100% {
+      --tw-gradient-from-position: 0%;   
+    }
+
+    50% {
+      --tw-gradient-from-position: 20%;   
     }
   }
 }
@@ -38,230 +49,230 @@ code {
 
 @keyframes ultraviolet-background-animation {
     0% {
-        --c-0: hsla(273.4054054054054, 100%, 63%, 1);
-        --x-0: 44%;
-        --y-0: 88%;
-        --s-start-0: 12%;
-        --s-end-0: 55%;
-        --c-1: hsla(187.68595041322314, 100%, 47%, 1);
-        --x-1: 65%;
-        --y-1: 4%;
-        --s-start-1: 8%;
-        --s-end-1: 72%;
-        --c-2: hsla(292.53588516746413, 96%, 57%, 1);
-        --x-2: 84%;
-        --y-2: 88%;
-        --s-start-2: 3%;
-        --s-end-2: 65%;
-        --c-3: hsla(79.82608695652175, 100%, 45%, 1);
-        --x-3: 22%;
-        --y-3: 44%;
-        --s-start-3: 6%;
-        --s-end-3: 40%;
-        --c-4: hsla(345.4708520179372, 100%, 56%, 1);
-        --x-4: 22%;
-        --y-4: 22%;
-        --s-start-4: 6%;
-        --s-end-4: 40%;
+        --uvbg-c-0: hsla(273.4054054054054, 100%, 63%, 1);
+        --uvbg-x-0: 44%;
+        --uvbg-y-0: 88%;
+        --uvbg-s-start-0: 12%;
+        --uvbg-s-end-0: 55%;
+        --uvbg-c-1: hsla(187.68595041322314, 100%, 47%, 1);
+        --uvbg-x-1: 65%;
+        --uvbg-y-1: 4%;
+        --uvbg-s-start-1: 8%;
+        --uvbg-s-end-1: 72%;
+        --uvbg-c-2: hsla(292.53588516746413, 96%, 57%, 1);
+        --uvbg-x-2: 84%;
+        --uvbg-y-2: 88%;
+        --uvbg-s-start-2: 3%;
+        --uvbg-s-end-2: 65%;
+        --uvbg-c-3: hsla(79.82608695652175, 100%, 45%, 1);
+        --uvbg-x-3: 22%;
+        --uvbg-y-3: 44%;
+        --uvbg-s-start-3: 6%;
+        --uvbg-s-end-3: 40%;
+        --uvbg-c-4: hsla(345.4708520179372, 100%, 56%, 1);
+        --uvbg-x-4: 22%;
+        --uvbg-y-4: 22%;
+        --uvbg-s-start-4: 6%;
+        --uvbg-s-end-4: 40%;
     }
 
     100% {
-        --c-0: hsla(275.09433962264154, 82%, 37%, 1);
-        --x-0: 88%;
-        --y-0: 94%;
-        --s-start-0: 22%;
-        --s-end-0: 80%;
-        --c-1: hsla(199.18032786885246, 100%, 47%, 1);
-        --x-1: 44%;
-        --y-1: 12%;
-        --s-start-1: 8%;
-        --s-end-1: 72%;
-        --c-2: hsla(329.2173913043478, 100%, 45%, 1);
-        --x-2: 95%;
-        --y-2: 45%;
-        --s-start-2: 5%;
-        --s-end-2: 52%;
-        --c-3: hsla(160, 100%, 30%, 1);
-        --x-3: 95%;
-        --y-3: 45%;
-        --s-start-3: 20%;
-        --s-end-3: 55%;
-        --c-4: hsla(30.133333333333336, 100%, 44%, 1);
-        --x-4: 22%;
-        --y-4: 22%;
-        --s-start-4: 20%;
-        --s-end-4: 55%;
+        --uvbg-c-0: hsla(275.09433962264154, 82%, 37%, 1);
+        --uvbg-x-0: 88%;
+        --uvbg-y-0: 94%;
+        --uvbg-s-start-0: 22%;
+        --uvbg-s-end-0: 80%;
+        --uvbg-c-1: hsla(199.18032786885246, 100%, 47%, 1);
+        --uvbg-x-1: 44%;
+        --uvbg-y-1: 12%;
+        --uvbg-s-start-1: 8%;
+        --uvbg-s-end-1: 72%;
+        --uvbg-c-2: hsla(329.2173913043478, 100%, 45%, 1);
+        --uvbg-x-2: 95%;
+        --uvbg-y-2: 45%;
+        --uvbg-s-start-2: 5%;
+        --uvbg-s-end-2: 52%;
+        --uvbg-c-3: hsla(160, 100%, 30%, 1);
+        --uvbg-x-3: 95%;
+        --uvbg-y-3: 45%;
+        --uvbg-s-start-3: 20%;
+        --uvbg-s-end-3: 55%;
+        --uvbg-c-4: hsla(30.133333333333336, 100%, 44%, 1);
+        --uvbg-x-4: 22%;
+        --uvbg-y-4: 22%;
+        --uvbg-s-start-4: 20%;
+        --uvbg-s-end-4: 55%;
     }
 }
 
-@property --c-0 {
+@property --uvbg-c-0 {
     syntax: '<color>';
     inherits: false;
     initial-value: hsla(273.4054054054054, 100%, 63%, 1)
 }
 
-@property --x-0 {
+@property --uvbg-x-0 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 44%
 }
 
-@property --y-0 {
+@property --uvbg-y-0 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 88%
 }
 
-@property --s-start-0 {
+@property --uvbg-s-start-0 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 12%
 }
 
-@property --s-end-0 {
+@property --uvbg-s-end-0 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 55%
 }
 
-@property --c-1 {
+@property --uvbg-c-1 {
     syntax: '<color>';
     inherits: false;
     initial-value: hsla(187.68595041322314, 100%, 47%, 1)
 }
 
-@property --x-1 {
+@property --uvbg-x-1 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 65%
 }
 
-@property --y-1 {
+@property --uvbg-y-1 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 4%
 }
 
-@property --s-start-1 {
+@property --uvbg-s-start-1 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 8%
 }
 
-@property --s-end-1 {
+@property --uvbg-s-end-1 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 72%
 }
 
-@property --c-2 {
+@property --uvbg-c-2 {
     syntax: '<color>';
     inherits: false;
     initial-value: hsla(292.53588516746413, 96%, 57%, 1)
 }
 
-@property --x-2 {
+@property --uvbg-x-2 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 84%
 }
 
-@property --y-2 {
+@property --uvbg-y-2 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 88%
 }
 
-@property --s-start-2 {
+@property --uvbg-s-start-2 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 3%
 }
 
-@property --s-end-2 {
+@property --uvbg-s-end-2 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 65%
 }
 
-@property --c-3 {
+@property --uvbg-c-3 {
     syntax: '<color>';
     inherits: false;
     initial-value: hsla(79.82608695652175, 100%, 45%, 1)
 }
 
-@property --x-3 {
+@property --uvbg-x-3 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 22%
 }
 
-@property --y-3 {
+@property --uvbg-y-3 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 44%
 }
 
-@property --s-start-3 {
+@property --uvbg-s-start-3 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 6%
 }
 
-@property --s-end-3 {
+@property --uvbg-s-end-3 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 40%
 }
 
-@property --c-4 {
+@property --uvbg-c-4 {
     syntax: '<color>';
     inherits: false;
     initial-value: hsla(345.4708520179372, 100%, 56%, 1)
 }
 
-@property --x-4 {
+@property --uvbg-x-4 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 22%
 }
 
-@property --y-4 {
+@property --uvbg-y-4 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 22%
 }
 
-@property --s-start-4 {
+@property --uvbg-s-start-4 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 6%
 }
 
-@property --s-end-4 {
+@property --uvbg-s-end-4 {
     syntax: '<percentage>';
     inherits: false;
     initial-value: 40%
 }
 
 .ultraviolet-background-animation {
-    --c-0: hsla(273.4054054054054, 100%, 63%, 1);
-    --x-0: 44%;
-    --y-0: 88%;
-    --c-1: hsla(187.68595041322314, 100%, 47%, 1);
-    --x-1: 65%;
-    --y-1: 4%;
-    --c-2: hsla(292.53588516746413, 96%, 57%, 1);
-    --x-2: 84%;
-    --y-2: 88%;
-    --c-3: hsla(79.82608695652175, 100%, 45%, 1);
-    --x-3: 22%;
-    --y-3: 44%;
-    --c-4: hsla(345.4708520179372, 100%, 56%, 1);
-    --x-4: 22%;
-    --y-4: 22%;
+    --uvbg-c-0: hsla(273.4054054054054, 100%, 63%, 1);
+    --uvbg-x-0: 44%;
+    --uvbg-y-0: 88%;
+    --uvbg-c-1: hsla(187.68595041322314, 100%, 47%, 1);
+    --uvbg-x-1: 65%;
+    --uvbg-y-1: 4%;
+    --uvbg-c-2: hsla(292.53588516746413, 96%, 57%, 1);
+    --uvbg-x-2: 84%;
+    --uvbg-y-2: 88%;
+    --uvbg-c-3: hsla(79.82608695652175, 100%, 45%, 1);
+    --uvbg-x-3: 22%;
+    --uvbg-y-3: 44%;
+    --uvbg-c-4: hsla(345.4708520179372, 100%, 56%, 1);
+    --uvbg-x-4: 22%;
+    --uvbg-y-4: 22%;
     background-color: hsla(357.1014492753623, 96%, 57%, 1);
-    background-image: radial-gradient(circle at var(--x-0) var(--y-0), var(--c-0) var(--s-start-0), transparent var(--s-end-0)), radial-gradient(circle at var(--x-1) var(--y-1), var(--c-1) var(--s-start-1), transparent var(--s-end-1)), radial-gradient(circle at var(--x-2) var(--y-2), var(--c-2) var(--s-start-2), transparent var(--s-end-2)), radial-gradient(circle at var(--x-3) var(--y-3), var(--c-3) var(--s-start-3), transparent var(--s-end-3)), radial-gradient(circle at var(--x-4) var(--y-4), var(--c-4) var(--s-start-4), transparent var(--s-end-4));
+    background-image: radial-gradient(circle at var(--uvbg-x-0) var(--uvbg-y-0), var(--uvbg-c-0) var(--uvbg-s-start-0), transparent var(--uvbg-s-end-0)), radial-gradient(circle at var(--uvbg-x-1) var(--uvbg-y-1), var(--uvbg-c-1) var(--uvbg-s-start-1), transparent var(--uvbg-s-end-1)), radial-gradient(circle at var(--uvbg-x-2) var(--uvbg-y-2), var(--uvbg-c-2) var(--uvbg-s-start-2), transparent var(--uvbg-s-end-2)), radial-gradient(circle at var(--uvbg-x-3) var(--uvbg-y-3), var(--uvbg-c-3) var(--uvbg-s-start-3), transparent var(--uvbg-s-end-3)), radial-gradient(circle at var(--uvbg-x-4) var(--uvbg-y-4), var(--uvbg-c-4) var(--uvbg-s-start-4), transparent var(--uvbg-s-end-4));
     animation: ultraviolet-background-animation 10s linear infinite alternate;
     background-blend-mode: normal, normal, normal, normal, normal;
 }
