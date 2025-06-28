@@ -11,6 +11,7 @@ import {
   getBlankSolution,
 
   type TSolution,
+  type PuzzleConstraints,
 } from '@/puzzle';
 
 import { Page } from '@/components/page';
@@ -29,12 +30,10 @@ export const Route = createFileRoute('/game/')({
   }
 })
 
-
 const GAME_CELL_BACKGROUNDS = {
   "red": "bg-linear-to-br from-red-700 to-amber-800",
   "green": "bg-linear-to-r from-green-700 to-teal-600",
   "blue": "bg-linear-to-b from-cyan-600 to-blue-800",
-  "violet-linear": "bg-linear-to-tr from-black from-10% to-violet-950",
   "violet": "bg-radial-[at_10%_100%] from-violet-950 to-black animate-radial-pulse",
   "ultraviolet": "ultraviolet-background-animation"
 }
@@ -44,6 +43,7 @@ interface GameCellProps {
   row: TRowKey,
   onOpenDialog: (c: TColKey, r: TRowKey) => void,
   solution: TSolution,
+  constraints: PuzzleConstraints,
 }
 function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
   const currentSolution = solution[col][row];
@@ -59,7 +59,7 @@ function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
     role="button" 
     className={clsx(
       "flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer",
-      GAME_CELL_BACKGROUNDS["violet"]
+      GAME_CELL_BACKGROUNDS["ultraviolet"]
     )}
     onClick={handleOpenDialog}
   >
@@ -156,22 +156,22 @@ function RouteComponent() {
 
             <HeaderCell>{constraints["1"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="B" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="C" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
+            <GameCell col="A" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="B" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="C" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
 
             <HeaderCell>{constraints["2"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="B" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="C" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
+            <GameCell col="A" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="B" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="C" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
 
 
             <HeaderCell>{constraints["3"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="B" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
-            <GameCell col="C" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} />
+            <GameCell col="A" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="B" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="C" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
           </div>
         </div>
 

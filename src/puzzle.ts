@@ -63,31 +63,38 @@ export function parsePuzzleSpec(input: unknown): TPuzzle {
   }
 }
 
-
-export type TSolution = {
+export type TGrid<T> = {
   [C in TColKey]: {
-    [R in TRowKey]: null | NrdbCardT;
+    [R in TRowKey]: T
   }
 }
 
-export function getBlankSolution(): TSolution {
+export function makeGrid<T>(fn: (c: TColKey, r: TRowKey) => T): TGrid<T> {
   return {
     "A": {
-      "1": null,
-      "2": null,
-      "3": null,
+      "1": fn('A', '1'),
+      "2": fn('A', '2'),
+      "3": fn('A', '3'),
     },
     "B": {
-      "1": null,
-      "2": null,
-      "3": null,
+      "1": fn('B', '1'),
+      "2": fn('B', '2'),
+      "3": fn('B', '3'),
     },
     "C": {
-      "1": null,
-      "2": null,
-      "3": null,
+      "1": fn('C', '1'),
+      "2": fn('C', '2'),
+      "3": fn('C', '3'),
     },
   }
+}
+
+export type TSolution = TGrid<null | NrdbCardT>
+
+export function getBlankSolution(): TSolution {
+  const blankSolution: TSolution = makeGrid(() => null);
+
+  return blankSolution;
 }
 
 

@@ -52,6 +52,8 @@ import {
   makeBlankPuzzleConstraints,
 } from "@/puzzle";
 
+import {shuffle, sample, choose} from '@/utils/random';
+
 const COSTS = [0,1,2,3,4,5];
 const ALPHABET = Array.from({ length: 26}, (_, n) => String.fromCharCode(n + 97));
 //const TITLE_WORDS = ["data", "net", "grid", "project", "wall", "campaign", "job", "test", "1", "2", "3"]
@@ -253,42 +255,6 @@ class PuzzleValidator {
   }
 }
 
-function randomInt(n: number): number {
-  return Math.floor(Math.random()*n);
-}
-
-function sample<T>(list: T[]): T {
-  return list[randomInt(list.length)];
-}
-
-function choose<T>(n: number, list: T[]): T[] {
-  const candidates: T[] = [...list];
-  const chosen: T[] = [];
-
-  if (n >= candidates.length) {
-    return candidates;
-  }
-
-  for (let i = 0; i < n; i++) {
-    const j = randomInt(candidates.length);
-    chosen.push(candidates[j]);
-    candidates.splice(j, 1);
-  }
-
-  return chosen;
-}
-
-function shuffle<T>(list: readonly T[]): T[] {
-  const next = [...list];
-  for (let i = next.length - 1; i >= 1; i--) {
-    const j = randomInt(i+1);
-    const tmp = next[j];
-    next[j] = next[i];
-    next[i] = tmp;
-  }
-
-  return next;
-}
 
 const SUBTYPE_GROUP_SIZE_THRESHOLD = 12;
 const ROW_SIZE_THRESHOLD = 5;
