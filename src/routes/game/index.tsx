@@ -59,7 +59,11 @@ function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
     role="button" 
     className={clsx(
       "flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer",
-      GAME_CELL_BACKGROUNDS["ultraviolet"]
+      //GAME_CELL_BACKGROUNDS["red"],
+      //GAME_CELL_BACKGROUNDS["green"],
+      //GAME_CELL_BACKGROUNDS["blue"],
+      //GAME_CELL_BACKGROUNDS["violet"],
+      //GAME_CELL_BACKGROUNDS["ultraviolet"],
     )}
     onClick={handleOpenDialog}
   >
