@@ -10,9 +10,11 @@ import {
   EXAMPLE_PUZZLE_4,
   getBlankSolution,
 
+  type TGrid,
   type TSolution,
   type PuzzleConstraints,
 } from '@/puzzle';
+import {PuzzleValidator} from '@/game/generator';
 
 import { Page } from '@/components/page';
 import { CardSelectDialog } from '@/components/card-select-dialog';
@@ -38,15 +40,38 @@ const GAME_CELL_BACKGROUNDS = {
   "ultraviolet": "ultraviolet-background-animation"
 }
 
+function getBackgroundFromCardPool(cardPool: NrdbCardT[]): keyof typeof GAME_CELL_BACKGROUNDS {
+  const size = cardPool.length;
+
+  if (size <= 2) {
+    return 'ultraviolet';
+  } else if (size <= 4) {
+    return 'violet';
+  } else if (size <= 9) {
+    return 'blue';
+  } else if (size <= 16) {
+    return 'green';
+  } else {
+    return 'red';
+  }
+}
+
 interface GameCellProps {
   col: TColKey,
   row: TRowKey,
   onOpenDialog: (c: TColKey, r: TRowKey) => void,
   solution: TSolution,
-  constraints: PuzzleConstraints,
+  cardPoolGrid: TGrid<NrdbCardT[]>,
 }
-function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
+function GameCell({onOpenDialog, col, row, solution, cardPoolGrid}: GameCellProps) {
   const currentSolution = solution[col][row];
+  const currentCardPool = cardPoolGrid[col][row]
+
+  const backgroundClass = React.useMemo(() => {
+    const key = getBackgroundFromCardPool(currentCardPool);
+
+    return GAME_CELL_BACKGROUNDS[key];
+  }, [currentCardPool]);
 
   const title = currentSolution?.title;
 
@@ -59,11 +84,7 @@ function GameCell({onOpenDialog, col, row, solution}: GameCellProps) {
     role="button" 
     className={clsx(
       "flex flex-col justify-center items-center text-center aspect-square p-1 rounded-lg text-lg md:text-2xl transition ring-2 ring-black dark:ring-violet-300 bg-white dark:bg-gray-950 cursor-pointer",
-      //GAME_CELL_BACKGROUNDS["red"],
-      //GAME_CELL_BACKGROUNDS["green"],
-      //GAME_CELL_BACKGROUNDS["blue"],
-      //GAME_CELL_BACKGROUNDS["violet"],
-      //GAME_CELL_BACKGROUNDS["ultraviolet"],
+      { [backgroundClass]: currentSolution },
     )}
     onClick={handleOpenDialog}
   >
@@ -91,6 +112,12 @@ function RouteComponent() {
   const {puzzle, dataByFormat} = Route.useLoaderData();
 
   const cardsInFormat = dataByFormat.standard.cards;
+
+  const cardPoolGrid = React.useMemo(() => {
+    const validator = new PuzzleValidator(cardsInFormat, puzzle.constraints);
+
+    return validator.intersectGrid();
+  }, [cardsInFormat, puzzle.constraints]);
 
   const [cardDialogState, setCardDialogState] = React.useState<CardDialogState>({
     isOpen: false,
@@ -160,22 +187,22 @@ function RouteComponent() {
 
             <HeaderCell>{constraints["1"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="B" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="C" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="A" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="B" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="C" row="1" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
 
             <HeaderCell>{constraints["2"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="B" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="C" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="A" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="B" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="C" row="2" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
 
 
             <HeaderCell>{constraints["3"].getName()}</HeaderCell>
 
-            <GameCell col="A" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="B" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
-            <GameCell col="C" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} constraints={constraints} />
+            <GameCell col="A" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="B" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
+            <GameCell col="C" row="3" onOpenDialog={handleOpenCardDialog} solution={solutionState} cardPoolGrid={cardPoolGrid} />
           </div>
         </div>
 

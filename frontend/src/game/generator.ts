@@ -50,6 +50,7 @@ import {
 import { 
   type IncompletePuzzleConstraints,
   makeBlankPuzzleConstraints,
+  makeGrid,
 } from "@/puzzle";
 
 import {shuffle, sample, choose} from '@/utils/random';
@@ -134,7 +135,7 @@ const generatorByKind: {[kind: string]: () => CardConstraint[]} = {
 }
 
 
-class PuzzleValidator {
+export class PuzzleValidator {
   cards: NrdbCardT[];
   constraints: IncompletePuzzleConstraints;
 
@@ -204,7 +205,7 @@ class PuzzleValidator {
     return sets;
   }
 
-  intersectGrid(): Array<NrdbCardT[]> {
+  intersectAll(): Array<NrdbCardT[]> {
     const colKeys = ["A", "B", "C"] as const;
     const rowKeys = ["1", "2", "3"] as const;
 
@@ -219,6 +220,14 @@ class PuzzleValidator {
     }
 
     return sets;
+  }
+
+  intersectGrid() {
+    return makeGrid((col, row) => {
+      const filterCards = this.intersectConstraint(col, row);
+
+      return filterCards(this.cards);
+    })
   }
 
   hasAllConstraints() {
@@ -245,7 +254,7 @@ class PuzzleValidator {
       }
     }
 
-    const sets = this.intersectGrid().map(cards => new Set(cards));
+    const sets = this.intersectAll().map(cards => new Set(cards));
     const merged = new Set(...sets);
     if (merged.size < 9) {
       return false;
