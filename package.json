@@ -3,10 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
+    "server": "tsx ./src/server/main.ts",
     "test": "vitest run"
   },
   "dependencies": {

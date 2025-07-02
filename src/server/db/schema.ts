@@ -8,8 +8,8 @@ import {
 const table = t.pgTable;
 
 
-const colKeyEnum = t.pgEnum('col_keys', ['A', 'B', 'C']);
-const rowKeyEnum = t.pgEnum('row_keys', ['1', '2', '3']);
+export const colKeyEnum = t.pgEnum('col_keys', ['A', 'B', 'C']);
+export const rowKeyEnum = t.pgEnum('row_keys', ['1', '2', '3']);
 
 const timestamps = () => ({
   updatedAt: t.timestamp('updated_at'),
@@ -31,7 +31,7 @@ const constraintJsonb = t.customType<{data: TConstraintSpec; driverData: string}
   }
 })
 
-export const puzzle = table('puzzle', {
+export const puzzleTable = table('puzzle', {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(), 
 
   constraintA: constraintJsonb('constraint_a').notNull(),
@@ -45,20 +45,23 @@ export const puzzle = table('puzzle', {
   ...timestamps(),
 });
 
-export const puzzleSchedule = table('puzzle_schedule', {
+export const scheduleTable = table('puzzle_schedule', {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
 
   date: t.date(),
-  puzzleId: t.integer().references(() => puzzle.id),
+  puzzleId: t.integer().references(() => puzzleTable.id),
 
 
   ...timestamps(),
-});
+}, (table) => [
+    t.index('date_order').on(table.date.desc())
+  ]
+);
 
-export const puzzleSolution = table('puzzle_solution', {
+export const solutionTable = table('puzzle_solution', {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
 
-  puzzleId: t.integer().references(() => puzzle.id),
+  puzzleId: t.integer().references(() => puzzleTable.id),
 
   col: colKeyEnum(),
   row: rowKeyEnum(),
