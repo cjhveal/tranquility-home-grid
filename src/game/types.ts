@@ -169,7 +169,7 @@ export type NrdbDataByFormat = {
   [F in TFormatCode]: FormatData
 }
 
-const ConstraintSpecSchema = z.union([
+export const ConstraintSpecSchema = z.union([
   z.object({
     kind: z.literal('titleStart'),
     payload: z.object({
