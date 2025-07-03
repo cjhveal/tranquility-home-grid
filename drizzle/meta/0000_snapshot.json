@@ -1,11 +1,11 @@
 {
-  "id": "a4cbcefc-bd83-408d-b7be-406ed3776145",
+  "id": "cd047797-a9e9-4785-809d-497c5d29dad2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.puzzle": {
-      "name": "puzzle",
+    "public.solution_answers": {
+      "name": "solution_answers",
       "schema": "",
       "columns": {
         "id": {
@@ -15,7 +15,106 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "puzzle_id_seq",
+            "name": "solution_answers_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "solutionId": {
+          "name": "solutionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "col": {
+          "name": "col",
+          "type": "col_keys",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row": {
+          "name": "row",
+          "type": "row_keys",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "card_code": {
+          "name": "card_code",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "solution_answers_solutionId_puzzle_solutions_id_fk": {
+          "name": "solution_answers_solutionId_puzzle_solutions_id_fk",
+          "tableFrom": "solution_answers",
+          "tableTo": "puzzle_solutions",
+          "columnsFrom": [
+            "solutionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "solution_answers_solutionId_col_row_unique": {
+          "name": "solution_answers_solutionId_col_row_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "solutionId",
+            "col",
+            "row"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.puzzles": {
+      "name": "puzzles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "puzzles_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -89,8 +188,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.puzzle_schedule": {
-      "name": "puzzle_schedule",
+    "public.puzzle_schedules": {
+      "name": "puzzle_schedules",
       "schema": "",
       "columns": {
         "id": {
@@ -100,7 +199,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "puzzle_schedule_id_seq",
+            "name": "puzzle_schedules_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -160,10 +259,10 @@
         }
       },
       "foreignKeys": {
-        "puzzle_schedule_puzzleId_puzzle_id_fk": {
-          "name": "puzzle_schedule_puzzleId_puzzle_id_fk",
-          "tableFrom": "puzzle_schedule",
-          "tableTo": "puzzle",
+        "puzzle_schedules_puzzleId_puzzles_id_fk": {
+          "name": "puzzle_schedules_puzzleId_puzzles_id_fk",
+          "tableFrom": "puzzle_schedules",
+          "tableTo": "puzzles",
           "columnsFrom": [
             "puzzleId"
           ],
@@ -180,8 +279,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.puzzle_solution": {
-      "name": "puzzle_solution",
+    "public.puzzle_solutions": {
+      "name": "puzzle_solutions",
       "schema": "",
       "columns": {
         "id": {
@@ -191,7 +290,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "puzzle_solution_id_seq",
+            "name": "puzzle_solutions_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -201,39 +300,61 @@
             "cycle": false
           }
         },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
         "puzzleId": {
           "name": "puzzleId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "col": {
-          "name": "col",
-          "type": "col_keys",
-          "typeSchema": "public",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
-        "row": {
-          "name": "row",
-          "type": "row_keys",
-          "typeSchema": "public",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         },
-        "card_code": {
-          "name": "card_code",
-          "type": "varchar(191)",
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "uuid_idx": {
+          "name": "uuid_idx",
+          "columns": [
+            {
+              "expression": "uuid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "puzzle_solution_puzzleId_puzzle_id_fk": {
-          "name": "puzzle_solution_puzzleId_puzzle_id_fk",
-          "tableFrom": "puzzle_solution",
-          "tableTo": "puzzle",
+        "puzzle_solutions_puzzleId_puzzles_id_fk": {
+          "name": "puzzle_solutions_puzzleId_puzzles_id_fk",
+          "tableFrom": "puzzle_solutions",
+          "tableTo": "puzzles",
           "columnsFrom": [
             "puzzleId"
           ],

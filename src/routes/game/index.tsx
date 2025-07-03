@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import clsx from 'clsx';
 import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query';
 
 import type {NrdbCardT, TColKey, TRowKey} from '@/types';
 import {
@@ -12,13 +13,13 @@ import {
 
   type TGrid,
   type TSolution,
-  type PuzzleConstraints,
 } from '@/puzzle';
 import {PuzzleValidator} from '@/game/generator';
 
 import { Page } from '@/components/page';
-import { CardSelectDialog } from '@/components/card-select-dialog';
+import { CardSelectDialog, useCardDialogState } from '@/components/card-select-dialog';
 
+import { useTRPC } from '@/utils/trpc';
 import {fetchNrdbData} from '@/utils/nrdbData';
 
 export const Route = createFileRoute('/game/')({
@@ -102,14 +103,11 @@ function HeaderCell({children}: HeaderCellProps) {
   </div>
 }
 
-interface CardDialogState {
-  isOpen: boolean,
-  firstConstraint: TColKey,
-  secondConstraint: TRowKey,
-}
-
 function RouteComponent() {
   const {puzzle, dataByFormat} = Route.useLoaderData();
+  const trpc = useTRPC();
+
+  const scheduleQuery = useQuery(trpc.getPuzzleSchedules.queryOptions());
 
   const cardsInFormat = dataByFormat.standard.cards;
 
@@ -119,28 +117,11 @@ function RouteComponent() {
     return validator.intersectGrid();
   }, [cardsInFormat, puzzle.constraints]);
 
-  const [cardDialogState, setCardDialogState] = React.useState<CardDialogState>({
-    isOpen: false,
-    firstConstraint: "A",
-    secondConstraint: "1",
-  });
-  const handleCloseCardDialog = () => {
-    setCardDialogState((state) => ({...state, isOpen: false}))
-  };
-
-  const handleOpenCardDialog = React.useCallback((firstKey: TColKey, secondKey: TRowKey) => {
-    const firstConstraint = firstKey;
-    const secondConstraint = secondKey;
-
-    setCardDialogState((state) => {
-      return {
-        ...state,
-        firstConstraint,
-        secondConstraint,
-        isOpen: true,
-      }
-    });
-  }, [puzzle, setCardDialogState]);
+  const {
+    cardDialogState,
+    handleOpenCardDialog,
+    handleCloseCardDialog,
+  } = useCardDialogState();
 
 
   const [solutionState, setSolutionState] = React.useState<TSolution>(getBlankSolution())
@@ -162,11 +143,10 @@ function RouteComponent() {
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">
       <CardSelectDialog 
+        {...cardDialogState}
         isOpen={cardDialogState.isOpen} 
         onClose={handleCloseCardDialog} 
         onSubmit={handleSubmitCard}
-        colConstraintKey={cardDialogState.firstConstraint}
-        rowConstraintKey={cardDialogState.secondConstraint}
         cardsInFormat={cardsInFormat}
         constraints={constraints}
       />

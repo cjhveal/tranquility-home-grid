@@ -1,36 +1,11 @@
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
 
-import {router, publicProcedure} from './trpc';
-
-import {db} from './db';
-import { puzzleTable } from './db/schema';
-
-
-const appRouter = router({
-  dailyPuzzle: publicProcedure
-    .query(async () => {
-      db.query
-    }),
-
-  getPuzzles: publicProcedure
-    .query(async () => {
-      db.select().from(puzzleTable).limit(10);
-    }),
-
-  startSolution: publicProcedure
-    .query(async () => {
-      
-    }),
-  updateSolution: publicProcedure
-    .query(async () => {
-      
-    }),
-
-
-});
+import { createContext } from './trpc';
+import { appRouter }  from './router';
 
 const server = createHTTPServer({
   router: appRouter,
+  createContext,
 });
  
 server.listen(8085);

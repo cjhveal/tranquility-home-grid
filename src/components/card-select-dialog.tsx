@@ -116,3 +116,40 @@ export function CardSelectDialog({
     </DialogPanel>
   </Dialog>
 }
+
+interface CardDialogState {
+  isOpen: boolean,
+  colConstraintKey: TColKey,
+  rowConstraintKey: TRowKey,
+}
+
+function makeDefaultCardDialogState(): CardDialogState {
+  return {
+    isOpen: false,
+    colConstraintKey: "A",
+    rowConstraintKey: "1",
+  }
+}
+export function useCardDialogState() {
+  const [cardDialogState, setCardDialogState] = React.useState<CardDialogState>(makeDefaultCardDialogState());
+
+  const handleOpenCardDialog = React.useCallback((colConstraintKey: TColKey, rowConstraintKey: TRowKey) => {
+    setCardDialogState(
+      (state) => ({
+          ...state,
+          colConstraintKey,
+          rowConstraintKey,
+          isOpen: true,
+      }))
+  }, [setCardDialogState]);
+
+  const handleCloseCardDialog = React.useCallback(() => {
+    setCardDialogState((state) => ({...state, isOpen: false}))
+  }, [setCardDialogState]);
+
+  return {
+    cardDialogState,
+    handleOpenCardDialog,
+    handleCloseCardDialog,
+  };
+}
