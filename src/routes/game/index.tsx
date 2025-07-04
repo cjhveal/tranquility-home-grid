@@ -140,6 +140,8 @@ function RouteComponent() {
 
   const {constraints} = puzzle;
 
+  console.log(scheduleQuery.data);
+
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">
       <CardSelectDialog 

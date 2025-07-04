@@ -45,7 +45,7 @@ export const puzzles = pg.pgTable('puzzles', {
 export const schedules = pg.pgTable('puzzle_schedules', {
   id: pg.integer().primaryKey().generatedAlwaysAsIdentity(),
 
-  date: pg.date(),
+  date: pg.date('date', {mode: 'date'}).notNull(),
   puzzleId: pg.integer().references(() => puzzles.id),
 
 
@@ -56,7 +56,10 @@ export const schedules = pg.pgTable('puzzle_schedules', {
 );
 
 export const schedulesRelations = relations(schedules, ({ one }) => ({
-  puzzle: one(puzzles),
+  puzzle: one(puzzles, {
+    fields: [schedules.puzzleId],
+    references: [puzzles.id],
+  }),
 }));
 
 export const solutions = pg.pgTable('puzzle_solutions', {
@@ -64,7 +67,7 @@ export const solutions = pg.pgTable('puzzle_solutions', {
 
   uuid: pg.uuid('uuid').default(sql`gen_random_uuid()`),
 
-  puzzleId: pg.integer().references(() => puzzles.id),
+  puzzleId: pg.integer().references(() => puzzles.id).notNull(),
 
   ...timestamps(),
 }, (table) => ([

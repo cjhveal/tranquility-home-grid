@@ -8,7 +8,7 @@ export async function createContext(opts: CreateHTTPContextOptions) {
 
   const auth = req.headers.authorization;
 
-  const isAdmin = (auth === process.env.SYSOP_AUTH_KEY);
+  const isAdmin = (process.env.SYSOP_AUTH_KEY && auth === process.env.SYSOP_AUTH_KEY);
 
   return { isAdmin };
 }

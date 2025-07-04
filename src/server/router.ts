@@ -1,22 +1,36 @@
 import {router, publicProcedure} from './trpc';
 
 import {db} from './db';
-import { puzzles } from './db/schema';
 
 export const appRouter = router({
-  dailyPuzzle: publicProcedure
-    .query(async () => {
-      db.query
-    }),
+  getPuzzleSchedules: publicProcedure.query(async () => {
+    try {
+    const values = await db.query.schedules.findMany({
+      columns: {
+        date: true,
+      },
+      orderBy: (schedules, {desc}) => [desc(schedules.date)],
+      where: (schedules, {lte}) => (lte(schedules.date, new Date())),
+      with: { puzzle: {
+        columns: {
+          constraintA: true,
+          constraintB: true,
+          constraintC: true,
+          constraint1: true,
+          constraint2: true,
+          constraint3: true,
+        },
+      }},
+    });
 
-  getPuzzleSchedules: publicProcedure
-    .query(async () => {
-      return { wow: 'yoooo!!' };
-    }),
+    return values;
+    } catch (err) {
+      console.log(err);
+    }
+  }),
 
   getPuzzles: publicProcedure
     .query(async () => {
-      db.select().from(puzzles).limit(10);
     }),
 
   startSolution: publicProcedure

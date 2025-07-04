@@ -1,0 +1,1 @@
+ALTER TABLE "puzzle_schedules" ALTER COLUMN "date" SET NOT NULL;

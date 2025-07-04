@@ -1,0 +1,1 @@
+ALTER TABLE "puzzle_solutions" ALTER COLUMN "puzzleId" SET NOT NULL;
