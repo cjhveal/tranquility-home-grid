@@ -103,7 +103,7 @@ export const NrdbCardSchema = z.object({
   cost: z.nullish(z.number()),
   deck_limit: z.number(),
   faction_code: z.literal(allFactionCodes),
-  faction_Cost: z.number(),
+  faction_cost: z.number(),
   flavor: z.optional(z.string()),
   illustrator: z.optional(z.string()),
   influence_limit: z.nullish(z.number()),
@@ -195,7 +195,7 @@ export const ConstraintSpecSchema = z.union([
     }),
   }),
   z.object({
-    kind: z.literal('illustratior'),
+    kind: z.literal('illustrator'),
     payload: z.object({
       illustrators: z.array(z.string())
     }),

@@ -8,9 +8,9 @@ export async function createContext(opts: CreateHTTPContextOptions) {
 
   const auth = req.headers.authorization;
 
-  const isAdmin = (process.env.SYSOP_AUTH_KEY && auth === process.env.SYSOP_AUTH_KEY);
+  const isSysop = (process.env.SYSOP_AUTH_TOKEN && auth === process.env.SYSOP_AUTH_TOKEN);
 
-  return { isAdmin };
+  return { isSysop };
 }
 
 type Context = Awaited<ReturnType<typeof createContext>>;
@@ -28,16 +28,16 @@ const t = initTRPC.context<Context>().create();
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-export const protectedProcedure = t.procedure.use(async function isAuthed(opts) {
+export const sysopProcedure = t.procedure.use(async function isAuthed(opts) {
   const { ctx } = opts;
 
-  if (!ctx.isAdmin) {
+  if (!ctx.isSysop) {
     throw new TRPCError({code: 'UNAUTHORIZED'});
   }
 
   return opts.next({
     ctx: {
-      isAdmin: true,
+      isSysop: true,
     }
   });
 });

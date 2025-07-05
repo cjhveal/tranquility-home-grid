@@ -1,5 +1,5 @@
-import { factionCodeToName } from '@/types';
-import type { NrdbCardT, TConstraintKind, TConstraintSpecByKind, PayloadOf } from '@/types';
+import { factionCodeToName } from '@/game/types';
+import type { NrdbCardT, TConstraintKind, TConstraintSpecByKind, PayloadOf } from '@/game/types';
 import { getSubtypesForCard } from '@/utils/cards';
 
 export abstract class CardConstraint<K extends TConstraintKind = TConstraintKind> {

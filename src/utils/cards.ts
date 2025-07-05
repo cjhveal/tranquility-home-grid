@@ -1,4 +1,4 @@
-import type {NrdbCardT} from '@/types';
+import type {NrdbCardT} from '@/game/types';
 
 export function getSubtypesForCard(card: NrdbCardT): string[] {
   if (!card.keywords) {

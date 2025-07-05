@@ -8,7 +8,7 @@ import {
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 
 import type { AppRouter } from './server/router.ts';
-import { TRPCProvider } from './utils/trpc.ts';
+import { TRPCProvider, getSysopToken } from './utils/trpc.ts';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
@@ -63,13 +63,16 @@ function getQueryClient() {
 
 
 function App() {
-  const queryClient = makeQueryClient();
+  const queryClient = getQueryClient();
 
   const [trpcClient] = useState(() => 
     createTRPCClient<AppRouter>({
       links: [
         httpBatchLink({
           url: 'http://localhost:8085',
+          headers: () => ({
+            Authorization: getSysopToken(),
+          })
         }),
       ],
     }),

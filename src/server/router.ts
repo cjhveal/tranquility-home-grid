@@ -1,6 +1,8 @@
-import {router, publicProcedure} from './trpc';
+import * as z from 'zod/v4-mini';
+import {router, publicProcedure, sysopProcedure} from './trpc';
 
 import {db} from './db';
+import {puzzles, schedules} from './db/schema';
 
 export const appRouter = router({
   getPuzzleSchedules: publicProcedure.query(async () => {
@@ -41,6 +43,24 @@ export const appRouter = router({
     .query(async () => {
       
     }),
+
+  sysopTest: sysopProcedure
+  .input(z.object({
+    test: z.string(),
+  }))
+  .mutation(async (opts) => {
+    console.log('SUCCESS!!!', opts.input.test);
+
+    return { success: true };
+  }),
+
+  createPuzzle: sysopProcedure
+  .mutation(async (opts) => {
+    /*
+    db.insert(puzzles).values({
+    })
+    */
+  })
 });
 
 export type AppRouter = typeof appRouter;

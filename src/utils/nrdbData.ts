@@ -1,5 +1,4 @@
-import {Type} from '@sinclair/typebox';
-import {Value} from '@sinclair/typebox/value';
+import * as z from 'zod/v4-mini';
 
 import {
   type TFormatCode,
@@ -7,9 +6,9 @@ import {
   type NrdbDataByFormat,
   type NrdbCardT,
   type NrdbPackT,
-  NrdbCardType,
-  NrdbPackType,
-} from '@/types';
+  NrdbCardSchema,
+  NrdbPackSchema,
+} from '@/game/types';
 
 
 
@@ -19,9 +18,9 @@ const CARD_DATA_URI = `${BASE_DATA_URI}/cards.json`
 const PACK_DATA_URI = `${BASE_DATA_URI}/packs.json`
 
 
-const CardDataSchema = Type.Object({
-  imageUrlTemplate: Type.String(),
-  data: Type.Array(NrdbCardType),
+const CardDataSchema = z.object({
+  imageUrlTemplate: z.string(),
+  data: z.array(NrdbCardSchema),
 });
 
 export async function fetchCards() {
@@ -37,7 +36,7 @@ export async function fetchCards() {
     throw new Error('malformed card data');
   }
 
-  const parsedResponse = Value.Parse(CardDataSchema, body);
+  const parsedResponse = CardDataSchema.parse(body);
 
   return parsedResponse.data;
 }
@@ -59,7 +58,7 @@ export async function fetchPacks() {
 
   for (const rawPack of body.data) {
     try {
-      const parsedPack = Value.Parse(NrdbPackType, rawPack);
+      const parsedPack = NrdbPackSchema.parse(rawPack);
       if (parsedPack) {
         allPacks.push(parsedPack);
       }

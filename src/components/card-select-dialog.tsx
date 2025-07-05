@@ -7,7 +7,7 @@ import type {
   NrdbCardT,
   TColKey,
   TRowKey,
-} from '@/types';
+} from '@/game/types';
 import {CardConstraint} from '@/constraints';
 import {type PuzzleConstraints} from '@/puzzle';
 
@@ -81,11 +81,11 @@ export function CardSelectDialog({
       ...(secondErrors || []),
     ];
 
-    console.log(allErrors);
     if (allErrors.length === 0) {
       onSubmit(colConstraintKey, rowConstraintKey, selectedCard);     
       onClose();
     } else {
+      console.log(allErrors);
       handleCardError();
     }
 

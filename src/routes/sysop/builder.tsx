@@ -1,11 +1,12 @@
 import React from 'react';
 
 import { createFileRoute } from '@tanstack/react-router'
+import { useMutation } from '@tanstack/react-query';
 
 import type { 
   NrdbCardT,
   NrdbDataByFormat,
-} from '@/types';
+} from '@/game/types';
 
 import {
   CardConstraint,
@@ -27,6 +28,7 @@ import {
 
 import {Button} from '@/components/button';
 
+import {useTRPC, setSysopToken} from '@/utils/trpc';
 import {fetchNrdbData} from '@/utils/nrdbData';
 
 export const Route = createFileRoute('/sysop/builder')({
@@ -152,11 +154,10 @@ function BuilderGrid({selectedId, onSelectId, constraintMap, dataByFormat}: Buil
 }
 
 interface ConstraintsTableProps {
-  constraints: CardConstraint[],
+  constraintsWithCounts: ConstraintWithCounts[],
   selectConstraint: (c: CardConstraint) => void,
-  dataByFormat: NrdbDataByFormat,
 }
-function ConstraintsTable({constraints, selectConstraint, dataByFormat}: ConstraintsTableProps) {
+function ConstraintsTable({constraintsWithCounts, selectConstraint}: ConstraintsTableProps) {
   return (
     <table className="mx-auto max-w-2xl">
       <thead>
@@ -169,14 +170,14 @@ function ConstraintsTable({constraints, selectConstraint, dataByFormat}: Constra
       </thead>
 
       <tbody>
-        {constraints.map(constraint => {
+        {constraintsWithCounts.map(({constraint, counts}) => {
           const name = constraint.getName();
           return (
             <tr key={name} onClick={() => selectConstraint(constraint)}>
               <td>{name}</td>
-              <td>{constraint.filter(dataByFormat.eternal.cards).length}</td>
-              <td>{constraint.filter(dataByFormat.standard.cards).length}</td>
-              <td>{constraint.filter(dataByFormat.startup.cards).length}</td>
+              <td>{counts.eternal}</td>
+              <td>{counts.standard}</td>
+              <td>{counts.startup}</td>
             </tr>
           )
         })}
@@ -185,7 +186,15 @@ function ConstraintsTable({constraints, selectConstraint, dataByFormat}: Constra
   )
 }
 
+type ConstraintWithCounts = {
+  constraint: CardConstraint,
+  counts: {
+    [K in keyof NrdbDataByFormat]: number;
+  }
+}
+
 function RouteComponent() {
+  const trpc = useTRPC();
   const {dataByFormat} = Route.useLoaderData();
 
   const puzzle = React.useMemo(() => generatePuzzle(dataByFormat.standard), [dataByFormat.standard]);
@@ -199,6 +208,17 @@ function RouteComponent() {
   ...makeAllInfluenceConstraints(),
   ...makeAllFactionConstraints(),
 ], [dataByFormat]);
+
+  const constraintsWithCounts = React.useMemo<ConstraintWithCounts[]>(() => {
+    return allConstraints.map(constraint => ({
+      constraint,
+      counts: {
+        eternal: constraint.filter(dataByFormat.eternal.cards).length,
+        standard: constraint.filter(dataByFormat.standard.cards).length,
+        startup: constraint.filter(dataByFormat.startup.cards).length,
+      },
+    }));
+  }, [allConstraints, dataByFormat]);
 
   const [selectedId, setSelectedId] = React.useState("1");
   const [constraintMap, setConstraintMap] =  React.useState<IncompletePuzzleConstraints>(puzzle.constraints);
@@ -223,6 +243,16 @@ function RouteComponent() {
     }
   }
 
+  const [isOpenSysopControls, setIsOpenSysopControls] = React.useState(false);
+  const [sysopKeyValue, setSysopKeyValue] = React.useState<string>('');
+
+  const handleSetSysopKey = () => {
+    if (sysopKeyValue) {
+      setSysopToken(sysopKeyValue);
+      setIsOpenSysopControls(true);
+    }
+  }
+
   const handleGeneratePuzzle = () => {
     const newPuzzle = generatePuzzle(dataByFormat.standard);
 
@@ -237,6 +267,12 @@ function RouteComponent() {
       window.navigator.clipboard.writeText(JSON.stringify(spec));
     }
   }
+
+  const sysopTestMutation = useMutation(trpc.sysopTest.mutationOptions());
+
+  const handleTestSysopKey = () => {
+    sysopTestMutation.mutate({test: 'wow!'});
+  }
   
 
   return <div>
@@ -250,17 +286,38 @@ function RouteComponent() {
       dataByFormat={dataByFormat}
     />
 
-    <Button onClick={handleGeneratePuzzle}>
-      Generate Puzzle
-    </Button>
-    <Button onClick={handleCopyPuzzleSpec}>
-      Copy Puzzle Spec
-    </Button>
+    <div className="flex items-center justify-center w-full gap-4 p-4">
+      <Button onClick={handleGeneratePuzzle}>
+        Generate New Puzzle
+      </Button>
+      <Button onClick={handleCopyPuzzleSpec}>
+        Copy Puzzle Spec
+      </Button>
+    </div>
+
+    {isOpenSysopControls && (<div className="flex items-center justify-center w-full gap-4 p-4">
+      <Button onClick={handleTestSysopKey}>
+        Test Sysop
+      </Button>
+      <Button onClick={() => setIsOpenSysopControls(false)}>Edit Key</Button>
+    </div>)}
+    {!isOpenSysopControls && (<div className="flex items-center justify-center w-full gap-4 p-4">
+      <input
+        type="password"
+        className="py-1 px-2 rounded-lg text-black ring ring-violet-400"
+        value={sysopKeyValue}
+        onChange={(event) => {
+          setSysopKeyValue(event.target.value);
+        }}
+      />
+      <Button onClick={handleSetSysopKey}>
+        Jack In
+      </Button>
+    </div>)}
 
     <ConstraintsTable 
-      constraints={allConstraints}
+      constraintsWithCounts={constraintsWithCounts}
       selectConstraint={selectConstraint}
-      dataByFormat={dataByFormat}
     />
 
 

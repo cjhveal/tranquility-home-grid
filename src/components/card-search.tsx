@@ -4,7 +4,7 @@ import {matchSorter} from 'match-sorter';
 
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 
-import {type NrdbCardT} from '@/types';
+import {type NrdbCardT} from '@/game/types';
 
 
 

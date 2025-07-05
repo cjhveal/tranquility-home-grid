@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query';
 
-import type {NrdbCardT, TColKey, TRowKey} from '@/types';
+import type {NrdbCardT, TColKey, TRowKey} from '@/game/types';
 import {
   parsePuzzleSpec,
   //EXAMPLE_PUZZLE_3,
@@ -139,8 +139,6 @@ function RouteComponent() {
   }
 
   const {constraints} = puzzle;
-
-  console.log(scheduleQuery.data);
 
   return <Page>
     <div className="flex flex-col items-center justify-center w-full">

@@ -28,13 +28,13 @@ import {
   allTypeCodes,
   mainRunnerFactionCodes,
   mainCorpFactionCodes,
-} from '@/types';
+} from '@/game/types';
 import type {
   NrdbCardT,
   TColKey,
   TRowKey,
   FormatData
-} from '@/types';
+} from '@/game/types';
 
 import {
   CardConstraint,
