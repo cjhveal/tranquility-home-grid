@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import type {NrdbCardT, TColKey, TRowKey} from '@/game/types';
 import {
   parsePuzzleSpec,
-  //EXAMPLE_PUZZLE_3,
+  EXAMPLE_PUZZLE_3,
   EXAMPLE_PUZZLE_4,
   getBlankSolution,
 
@@ -107,7 +107,7 @@ function RouteComponent() {
   const {puzzle, dataByFormat} = Route.useLoaderData();
   const trpc = useTRPC();
 
-  const scheduleQuery = useQuery(trpc.getPuzzleSchedules.queryOptions());
+  const scheduleQuery = useQuery(trpc.getPuzzles.queryOptions());
 
   const cardsInFormat = dataByFormat.standard.cards;
 

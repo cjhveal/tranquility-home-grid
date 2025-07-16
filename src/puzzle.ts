@@ -35,7 +35,7 @@ export function makeBlankPuzzleConstraints(): IncompletePuzzleConstraints {
 
 
 export type TPuzzle = {
-  id: string, 
+  date: string,
   constraints: PuzzleConstraints,
 }
 
@@ -48,19 +48,21 @@ export const EXAMPLE_PUZZLE_5 = {"id":1,"constraints":{"1":{"kind":"subtype","pa
 export function parsePuzzleSpec(input: unknown): TPuzzle {
   const puzzleSpec = PuzzleSpecSchema.parse(input);
 
-  const constraintSpecs = puzzleSpec.constraints;
-
   return {
-    id: puzzleSpec.id,
+    date: puzzleSpec.date,
     constraints: {
-      "1": CardConstraint.fromSpec(constraintSpecs["1"]),
-      "2": CardConstraint.fromSpec(constraintSpecs["2"]),
-      "3": CardConstraint.fromSpec(constraintSpecs["3"]),
-      "A": CardConstraint.fromSpec(constraintSpecs["A"]),
-      "B": CardConstraint.fromSpec(constraintSpecs["B"]),
-      "C": CardConstraint.fromSpec(constraintSpecs["C"]),
+      "1": CardConstraint.fromSpec(puzzleSpec.constraint1),
+      "2": CardConstraint.fromSpec(puzzleSpec.constraint2),
+      "3": CardConstraint.fromSpec(puzzleSpec.constraint3),
+      "A": CardConstraint.fromSpec(puzzleSpec.constraintA),
+      "B": CardConstraint.fromSpec(puzzleSpec.constraintB),
+      "C": CardConstraint.fromSpec(puzzleSpec.constraintC),
     }
   }
+}
+
+export function makePuzzleSpecFor(puzzle: TPuzzle) {
+
 }
 
 export type TGrid<T> = {

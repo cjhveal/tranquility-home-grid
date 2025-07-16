@@ -226,7 +226,9 @@ export const ConstraintSpecSchema = z.union([
   }),
 ]);
 
+
 export type TConstraintSpec = z.infer<typeof ConstraintSpecSchema>;
+
 
 export type TConstraintKind = TConstraintSpec['kind'];
 
@@ -239,24 +241,21 @@ export type TConstraintSpecByKind = {
   [K in TConstraintKind]: { kind: K, payload: PayloadOf<K>};
 }
 
+export type TRowKey = "1" | "2" | "3";
+export type TColKey = "A" | "B" | "C";
+
+export type TConstraintKey = TRowKey | TColKey;
+
 export const PuzzleSpecSchema = z.object({
-  id: z.string(),
   date: z.iso.date(),
-  constraints: z.object({
-    "A": ConstraintSpecSchema,
-    "B": ConstraintSpecSchema,
-    "C": ConstraintSpecSchema,
-    "1": ConstraintSpecSchema,
-    "2": ConstraintSpecSchema,
-    "3": ConstraintSpecSchema,
-  
-  }),
+  constraintA: ConstraintSpecSchema,
+  constraintB: ConstraintSpecSchema,
+  constraintC: ConstraintSpecSchema,
+  constraint1: ConstraintSpecSchema,
+  constraint2: ConstraintSpecSchema,
+  constraint3: ConstraintSpecSchema,
 });
 
 export type TPuzzleSpec = z.infer<typeof PuzzleSpecSchema>
 
-export type TConstraintKey = keyof TPuzzleSpec['constraints']
-
-export type TRowKey = "1" | "2" | "3";
-export type TColKey = "A" | "B" | "C";
 

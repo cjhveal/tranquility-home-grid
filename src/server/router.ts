@@ -1,28 +1,30 @@
 import * as z from 'zod/v4-mini';
-import {router, publicProcedure, sysopProcedure} from './trpc';
 
+import { 
+  PuzzleSpecSchema,
+} from "@/game/types";
+
+import {router, publicProcedure, sysopProcedure} from './trpc';
 import {db} from './db';
-import {puzzles, schedules} from './db/schema';
+import {
+  puzzles,
+} from './db/schema';
 
 export const appRouter = router({
-  getPuzzleSchedules: publicProcedure.query(async () => {
+  getPuzzles: publicProcedure.query(async () => {
     try {
-    const values = await db.query.schedules.findMany({
+    const values = await db.query.puzzles.findMany({
       columns: {
         date: true,
+        constraintA: true,
+        constraintB: true,
+        constraintC: true,
+        constraint1: true,
+        constraint2: true,
+        constraint3: true,
       },
-      orderBy: (schedules, {desc}) => [desc(schedules.date)],
-      where: (schedules, {lte}) => (lte(schedules.date, new Date())),
-      with: { puzzle: {
-        columns: {
-          constraintA: true,
-          constraintB: true,
-          constraintC: true,
-          constraint1: true,
-          constraint2: true,
-          constraint3: true,
-        },
-      }},
+      orderBy: (puzzles, {desc}) => [desc(puzzles.date)],
+      where: (puzzles, {lte}) => (lte(puzzles.date, new Date().toISOString())),
     });
 
     return values;
@@ -30,10 +32,6 @@ export const appRouter = router({
       console.log(err);
     }
   }),
-
-  getPuzzles: publicProcedure
-    .query(async () => {
-    }),
 
   startSolution: publicProcedure
     .query(async () => {
@@ -55,11 +53,9 @@ export const appRouter = router({
   }),
 
   createPuzzle: sysopProcedure
+  .input(PuzzleSpecSchema)
   .mutation(async (opts) => {
-    /*
-    db.insert(puzzles).values({
-    })
-    */
+    return await db.insert(puzzles).values(opts.input).returning();
   })
 });
 

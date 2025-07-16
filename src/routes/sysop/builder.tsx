@@ -153,6 +153,13 @@ function BuilderGrid({selectedId, onSelectId, constraintMap, dataByFormat}: Buil
   </div>
 }
 
+type ConstraintWithCounts = {
+  constraint: CardConstraint,
+  counts: {
+    [K in keyof NrdbDataByFormat]: number;
+  }
+}
+
 interface ConstraintsTableProps {
   constraintsWithCounts: ConstraintWithCounts[],
   selectConstraint: (c: CardConstraint) => void,
@@ -186,12 +193,41 @@ function ConstraintsTable({constraintsWithCounts, selectConstraint}: Constraints
   )
 }
 
-type ConstraintWithCounts = {
-  constraint: CardConstraint,
-  counts: {
-    [K in keyof NrdbDataByFormat]: number;
-  }
+interface DatePickerProps {
+  value: string;
+  onChange: (value: string) => void;
 }
+function DatePicker(props: DatePickerProps) {
+  const { value, onChange } = props;
+
+  const handleChange = (timestamp: string) => {
+    onChange(timestamp.slice(0,10));    
+  }
+
+  const moveDay = (days: number) => {
+    const date = new Date(value);
+
+    date.setDate(date.getDate() + days);
+
+    handleChange(date.toISOString());
+  }
+
+
+  return <div className="flex gap-4">
+    <Button onClick={() => moveDay(-1)}>
+      -
+    </Button>
+    <input
+      type="date"
+      value={value}
+      onChange={(event) => handleChange(event.target.value)}
+    />
+    <Button onClick={() => moveDay(1)}>
+      +
+    </Button>
+  </div>
+}
+
 
 function RouteComponent() {
   const trpc = useTRPC();
@@ -222,6 +258,11 @@ function RouteComponent() {
 
   const [selectedId, setSelectedId] = React.useState("1");
   const [constraintMap, setConstraintMap] =  React.useState<IncompletePuzzleConstraints>(puzzle.constraints);
+  const [selectedDate, setSelectedDate] = React.useState(new Date().toISOString().slice(0,10));
+
+  const handleDateChange = (timestamp: string) => {
+    setSelectedDate(timestamp);
+  }
 
   const selectConstraint = React.useCallback((constraint: CardConstraint) => {
     setConstraintMap(state => ({...state, [selectedId]: constraint}))
@@ -230,15 +271,13 @@ function RouteComponent() {
   const getPuzzleSpec = () => {
     if (constraintMap["1"] && constraintMap["2"] && constraintMap["3"] && constraintMap["A"] && constraintMap["B"] && constraintMap["C"]) {
       return {
-        id: 1,
-        constraints: {
-          "1": constraintMap["1"].toSpec(),
-          "2": constraintMap["2"].toSpec(),
-          "3": constraintMap["3"].toSpec(),
-          "A": constraintMap["A"].toSpec(),
-          "B": constraintMap["B"].toSpec(),
-          "C": constraintMap["C"].toSpec(),
-        }
+        date: selectedDate,
+        constraint1: constraintMap["1"].toSpec(),
+        constraint2: constraintMap["2"].toSpec(),
+        constraint3: constraintMap["3"].toSpec(),
+        constraintA: constraintMap["A"].toSpec(),
+        constraintB: constraintMap["B"].toSpec(),
+        constraintC: constraintMap["C"].toSpec(),
       }
     }
   }
@@ -273,8 +312,16 @@ function RouteComponent() {
   const handleTestSysopKey = () => {
     sysopTestMutation.mutate({test: 'wow!'});
   }
-  
 
+  const createPuzzleMutation = useMutation(trpc.createPuzzle.mutationOptions());
+  const handleCreatePuzzle = () => {
+    const spec = getPuzzleSpec();
+    if (!spec) {
+      return;
+    }
+    createPuzzleMutation.mutate(spec);
+  }
+  
   return <div>
     <h1>Sysop Tools</h1>
     
@@ -286,6 +333,7 @@ function RouteComponent() {
       dataByFormat={dataByFormat}
     />
 
+
     <div className="flex items-center justify-center w-full gap-4 p-4">
       <Button onClick={handleGeneratePuzzle}>
         Generate New Puzzle
@@ -295,9 +343,17 @@ function RouteComponent() {
       </Button>
     </div>
 
+    
+    <div className="flex items-center justify-center w-full gap-4 p-4">
+      <DatePicker value={selectedDate} onChange={handleDateChange}/>
+    </div>
+
     {isOpenSysopControls && (<div className="flex items-center justify-center w-full gap-4 p-4">
       <Button onClick={handleTestSysopKey}>
         Test Sysop
+      </Button>
+      <Button onClick={handleCreatePuzzle}>
+        Create Puzzle
       </Button>
       <Button onClick={() => setIsOpenSysopControls(false)}>Edit Key</Button>
     </div>)}

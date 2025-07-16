@@ -1,6 +1,8 @@
-import { factionCodeToName } from '@/game/types';
+import { factionCodeToName, ConstraintSpecSchema } from '@/game/types';
 import type { NrdbCardT, TConstraintKind, TConstraintSpecByKind, PayloadOf } from '@/game/types';
 import { getSubtypesForCard } from '@/utils/cards';
+
+
 
 export abstract class CardConstraint<K extends TConstraintKind = TConstraintKind> {
   kind: K;
@@ -20,10 +22,10 @@ export abstract class CardConstraint<K extends TConstraintKind = TConstraintKind
   abstract validate(card: NrdbCardT): undefined | string[]
 
   toSpec() {
-    return {
+    return ConstraintSpecSchema.parse({
       kind: this.kind,
       payload: {...this.payload},
-    }
+    })
   }
 
   filter(cards: NrdbCardT[]): NrdbCardT[] {

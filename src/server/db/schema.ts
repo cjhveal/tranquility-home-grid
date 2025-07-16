@@ -1,6 +1,8 @@
 import * as pg from "drizzle-orm/pg-core";
 import {relations, sql} from 'drizzle-orm';
 
+import { createSelectSchema, createInsertSchema, createUpdateSchema } from 'drizzle-zod';
+
 import { 
   ConstraintSpecSchema,
   type TConstraintSpec,
@@ -32,6 +34,8 @@ const constraintJsonb = pg.customType<{data: TConstraintSpec; driverData: string
 export const puzzles = pg.pgTable('puzzles', {
   id: pg.integer().primaryKey().generatedAlwaysAsIdentity(), 
 
+  date: pg.date('date', {mode: 'string'}).notNull(),
+
   constraintA: constraintJsonb('constraint_a').notNull(),
   constraintB: constraintJsonb('constraint_b').notNull(),
   constraintC: constraintJsonb('constraint_c').notNull(),
@@ -40,27 +44,11 @@ export const puzzles = pg.pgTable('puzzles', {
   constraint3: constraintJsonb('constraint_3').notNull(),
   
   ...timestamps(),
-});
-
-export const schedules = pg.pgTable('puzzle_schedules', {
-  id: pg.integer().primaryKey().generatedAlwaysAsIdentity(),
-
-  date: pg.date('date', {mode: 'date'}).notNull(),
-  puzzleId: pg.integer().references(() => puzzles.id),
-
-
-  ...timestamps(),
 }, (table) => [
     pg.index('date_order').on(table.date.desc())
   ]
 );
-
-export const schedulesRelations = relations(schedules, ({ one }) => ({
-  puzzle: one(puzzles, {
-    fields: [schedules.puzzleId],
-    references: [puzzles.id],
-  }),
-}));
+export const puzzlesInsertSchema = createInsertSchema(puzzles)
 
 export const solutions = pg.pgTable('puzzle_solutions', {
   id: pg.integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -91,7 +79,8 @@ export const answers = pg.pgTable('solution_answers', {
 
   ...timestamps(),
 }, (table) => [
-  pg.unique().on(table.solutionId, table.col, table.row),
+  pg.unique('solution_grid_unique').on(table.solutionId, table.col, table.row),
+  pg.unique('solution_card_unique').on(table.solutionId, table.cardCode),
 ]);
 
 export const answersRelations = relations(answers, ({ one }) => ({
